@@ -58,7 +58,7 @@
 /*    */ }
 
 
-/* Location:              C:\Users\victo\Documents\UFJF\TP\Gest„o\IntegraAPI-2018.jar!/br/ufjf/ice/integra3/ws/login/IsValidToken.class
+/* Location:              C:\Users\victo\Documents\UFJF\TP\Gest√£o\IntegraAPI-2018.jar!/br/ufjf/ice/integra3/ws/login/IsValidToken.class
  * Java compiler version: 8 (52.0)
  * JD-Core Version:       1.0.7
  */

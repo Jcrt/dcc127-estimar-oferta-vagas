@@ -73,7 +73,7 @@ public interface IWsLogin {
 }
 
 
-/* Location:              C:\Users\victo\Documents\UFJF\TP\Gest„o\IntegraAPI-2018.jar!/br/ufjf/ice/integra3/ws/login/IWsLogin.class
+/* Location:              C:\Users\victo\Documents\UFJF\TP\Gest√£o\IntegraAPI-2018.jar!/br/ufjf/ice/integra3/ws/login/IWsLogin.class
  * Java compiler version: 8 (52.0)
  * JD-Core Version:       1.0.7
  */

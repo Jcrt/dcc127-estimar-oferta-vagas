@@ -1,19 +1,18 @@
 package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.AlunoRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.EventoAceRepository;
+
+import javax.annotation.PostConstruct;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Named
 @ViewScoped
