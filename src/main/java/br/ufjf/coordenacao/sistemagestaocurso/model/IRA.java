@@ -24,8 +24,9 @@ public class IRA implements Serializable, Cloneable {
 	private String semestre; 
 	private float iraSemestre;
 	private float iraAcumulado;
-	
-	public Object clone()throws CloneNotSupportedException{
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
 		return super.clone();
 	}
 	
@@ -88,6 +89,4 @@ public class IRA implements Serializable, Cloneable {
 	public void setCurso(Curso curso) {
 		this.curso = curso;
 	}
-	
-	
 }
