@@ -1,7 +1,5 @@
 (function($) {
-
   $.fn.menumaker = function(options) {
-      
       var cssmenu = $(this), settings = $.extend({
         title: "Menu",
         format: "dropdown",
@@ -26,7 +24,7 @@
 
         cssmenu.find('li ul').parent().addClass('has-sub');
 
-        multiTg = function() {
+        let multiTg = function() {
           cssmenu.find(".has-sub").prepend('<span class="submenu-button"></span>');
           cssmenu.find('.submenu-button').on('click', function() {
             $(this).toggleClass('submenu-opened');
@@ -39,12 +37,15 @@
           });
         };
 
-        if (settings.format === 'multitoggle') multiTg();
-        else cssmenu.addClass('dropdown');
+        if (settings.format === 'multitoggle')
+          multiTg();
+        else
+          cssmenu.addClass('dropdown');
 
-        if (settings.sticky === true) cssmenu.css('position', 'fixed');
+        if (settings.sticky === true)
+          cssmenu.css('position', 'fixed');
 
-        resizeFix = function() {
+        let resizeFix = function() {
           if ($( window ).width() > 768) {
             cssmenu.find('ul').show();
           }
@@ -53,6 +54,7 @@
             cssmenu.find('ul').hide().removeClass('open');
           }
         };
+
         resizeFix();
         return $(window).on('resize', resizeFix);
 
