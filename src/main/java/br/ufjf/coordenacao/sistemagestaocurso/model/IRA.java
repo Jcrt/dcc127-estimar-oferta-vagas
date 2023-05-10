@@ -1,16 +1,7 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
 
 @Entity
 @SequenceGenerator(name="ira_sequencia", sequenceName="ira_seq", allocationSize=1)
@@ -26,7 +17,7 @@ public class IRA implements Serializable, Cloneable {
 	private float iraAcumulado;
 
 	@Override
-	public Object clone() throws CloneNotSupportedException{
+	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
 	

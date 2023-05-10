@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 public class IRATest {
     @Test
     @DisplayName("Given IRA object WHEN clone is called THEN should create a different object")
-    public void test1() throws CloneNotSupportedException{
+    public void GIVEN_iraObject_WHEN_cloneIsCalled_THEN_shouldCreateADifferentObject() throws CloneNotSupportedException{
         IRA originalIra = new IRA();
         IRA clonnedIra = (IRA) originalIra.clone();
-        Assertions.assertFalse(originalIra.equals(clonnedIra));
+        Assertions.assertNotEquals(originalIra, clonnedIra);
     }
 }
