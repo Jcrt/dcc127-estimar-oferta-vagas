@@ -12,6 +12,7 @@
 - [ ] 🐱‍🐉 Refatoração
 - [ ] 🐱‍🚀 Testes unitários
 - [ ] 🐱‍👤 Aplicação de design pattern
+- [ ] 📄 Documentaçao
 
 #### Observações relevantes
 [Preencha aqui caso haja observações relevantes acerca do seu pull request]
