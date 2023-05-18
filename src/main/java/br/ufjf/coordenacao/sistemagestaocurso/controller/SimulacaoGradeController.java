@@ -1,36 +1,11 @@
 package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
-import java.io.Serializable;
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.apache.log4j.Logger;
-import org.primefaces.component.datatable.DataTable;
-
-import br.ufjf.coordenacao.OfertaVagas.model.Curriculum;
-import br.ufjf.coordenacao.OfertaVagas.model.Student;
-import br.ufjf.coordenacao.OfertaVagas.model.StudentsHistory;
 import br.ufjf.coordenacao.OfertaVagas.model.Class;
-import br.ufjf.coordenacao.OfertaVagas.model.ClassStatus;
+import br.ufjf.coordenacao.OfertaVagas.model.*;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.CalculadorMateriasExcedentes;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.Ordenar;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
-import br.ufjf.coordenacao.sistemagestaocurso.model.EventoAce;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Historico;
+import br.ufjf.coordenacao.sistemagestaocurso.model.*;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.SituacaoDisciplina;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.AlunoRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
@@ -39,6 +14,18 @@ import br.ufjf.coordenacao.sistemagestaocurso.repository.GradeRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.util.jpa.Transactional;
+import org.apache.log4j.Logger;
+import org.primefaces.component.datatable.DataTable;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.Serializable;
+import java.text.Normalizer;
+import java.util.*;
 
 @Named
 @ViewScoped
@@ -103,8 +90,8 @@ public class SimulacaoGradeController implements Serializable {
   private List<SituacaoDisciplina> listaDisciplinaEletivas = new ArrayList<SituacaoDisciplina>();
   private List<SituacaoDisciplina> listaDisciplinaOpcionais = new ArrayList<SituacaoDisciplina>();
 
-  private Curso curso = new Curso();
-  private static final Logger logger = Logger.getLogger(AlunoSituacaoController.class);
+	private static final Logger logger = Logger.getLogger(SimulacaoGradeController.class);
+	private Curso curso = new Curso();
   
 	@PostConstruct
 	public void init()  {
