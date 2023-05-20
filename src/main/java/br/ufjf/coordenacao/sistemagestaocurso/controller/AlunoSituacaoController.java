@@ -56,16 +56,6 @@ public class AlunoSituacaoController {
     private int horasEletivas;
     private int horasOpcionais;
     private int horasACE;
-
-    @Inject
-    private DisciplinaRepository disciplinas;
-    @Inject
-    private EventoAceRepository eventosAceRepository;
-    @Inject
-    private EventoAce eventoAceSelecionado;
-    @Inject
-    private AlunoRepository alunos;
-
     private List<EventoAce> listaEventosAceSelecionadas;
     private List<SituacaoDisciplina> listaDisciplinaEletivasSelecionadas;
     private List<SituacaoDisciplina> listaDisciplinaOpcionaisSelecionadas;
@@ -75,10 +65,20 @@ public class AlunoSituacaoController {
     private List<SituacaoDisciplina> listaDisciplinaObrigatorias;
     private List<SituacaoDisciplina> listaDisciplinaEletivas;
     private List<SituacaoDisciplina> listaDisciplinaOpcionais;
-
     private Curso curso = new Curso();
+
+    @Inject
+    private DisciplinaRepository disciplinas;
+    @Inject
+    private EventoAceRepository eventosAceRepository;
+    @Inject
+    private EventoAce eventoAceSelecionado;
+    @Inject
+    private AlunoRepository alunos;
     @Inject
     private UsuarioController usuarioController;
+    @Inject
+    private FacesContext facesContext;
 
     public AlunoSituacaoController() {
         eventosAce = new EventoAce();
@@ -113,7 +113,7 @@ public class AlunoSituacaoController {
 
                 if (aluno == null || aluno.getMatricula() == null) {
                     FacesMessage msg = new FacesMessage("Matrícula não cadastrada na base!");
-                    FacesContext.getCurrentInstance().addMessage(null, msg);
+                    facesContext.addMessage(null, msg);
                     return;
                 }
                 curso = aluno.getCurso();
@@ -124,7 +124,7 @@ public class AlunoSituacaoController {
                 if (curso.getGrupoAlunos().size() == 0) {
 
                     FacesMessage msg = new FacesMessage("Nenhum aluno cadastrado no curso!");
-                    FacesContext.getCurrentInstance().addMessage(null, msg);
+                    facesContext.addMessage(null, msg);
                 }
             }
         } catch (Exception e) {
@@ -197,7 +197,7 @@ public class AlunoSituacaoController {
 
         if (st == null) {
             FacesMessage msg = new FacesMessage("O aluno:" + aluno.getMatricula() + " não tem nenhum histórico de matrícula cadastrado!");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
+            facesContext.addMessage(null, msg);
             return;
         }
 
@@ -288,17 +288,23 @@ public class AlunoSituacaoController {
         this.resetaDataTables();
     }
 
+    /**
+     * Reseta todas as {@link DataTable}
+     */
     public void resetaDataTables() {
-        DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("form:gridObrigatorias");
-        dataTable.clearInitialState();
-        dataTable.reset();
-        dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("form:gridEletivas");
-        dataTable.clearInitialState();
-        dataTable.reset();
-        dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("form:gridOpcionais");
-        dataTable.clearInitialState();
-        dataTable.reset();
-        dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("form:gridAce");
+        this.resetDataTable("form:gridObrigatorias");
+        this.resetDataTable("form:gridEletivas");
+        this.resetDataTable("form:gridOpcionais");
+        this.resetDataTable("form:gridAce");
+    }
+
+    /**
+     * Reseta a {@link DataTable} baseada na expressão de busca
+     *
+     * @param expressao A expressão de busca da {@link DataTable}
+     */
+    private void resetDataTable(String expressao) {
+        DataTable dataTable = (DataTable) facesContext.getViewRoot().findComponent(expressao);
         dataTable.clearInitialState();
         dataTable.reset();
     }
@@ -407,18 +413,18 @@ public class AlunoSituacaoController {
 
         if (eventosAce.getPeriodo() == 0) {
             FacesMessage msg = new FacesMessage("Preencha o campo \"Período\"");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
+            facesContext.addMessage(null, msg);
             return;
         }
         eventosAce.setDescricao(eventosAce.getDescricao().trim());
         if (eventosAce.getDescricao().isEmpty()) {
             FacesMessage msg = new FacesMessage("Preencha o campo Descrição!");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
+            facesContext.addMessage(null, msg);
             return;
         }
         if (eventosAce.getHoras() == 0) {
             FacesMessage msg = new FacesMessage("Preencha o campo Carga Horária!");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
+            facesContext.addMessage(null, msg);
             return;
         }
         eventosAce.setDescricao(eventosAce.getDescricao().toUpperCase());
