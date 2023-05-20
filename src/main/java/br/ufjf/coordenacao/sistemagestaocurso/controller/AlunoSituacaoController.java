@@ -121,8 +121,7 @@ public class AlunoSituacaoController {
 
             } else {
                 curso = usuarioController.getAutenticacao().getCursoSelecionado();
-                if (curso.getGrupoAlunos().size() == 0) {
-
+                if (curso.getGrupoAlunos().isEmpty()) {
                     FacesMessage msg = new FacesMessage("Nenhum aluno cadastrado no curso!");
                     facesContext.addMessage(null, msg);
                 }
