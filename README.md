@@ -24,3 +24,9 @@ Repositório com a versão web do sistema, para aplicação de técnicas de enge
 	JDBC.PASSWORD = <senha do usuário do banco de dados>
 	JDBC.DRIVER = com.mysql.jdbc.Driver
 	```
+## Como fazer
+Esta seção é dedicada a detalhes de 'como fazer' dentro do projeto.
+Os documentos aqui contidos estão dentro da nossa página de Wiki. 
+Vai lá dá uma lida, sô!
+
+1. [[Como fazer] Testes unitários](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%5BComo-fazer%5D-Testes-unit%C3%A1rios)
