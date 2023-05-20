@@ -1,36 +1,17 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
+import br.ufjf.coordenacao.OfertaVagas.model.Class;
+import br.ufjf.coordenacao.OfertaVagas.model.*;
+import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
+import br.ufjf.coordenacao.sistemagestaocurso.repository.EventoAceRepository;
+import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
+import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Transient;
-
-import br.ufjf.coordenacao.OfertaVagas.model.Class;
-import br.ufjf.coordenacao.OfertaVagas.model.ClassStatus;
-import br.ufjf.coordenacao.OfertaVagas.model.Curriculum;
-import br.ufjf.coordenacao.OfertaVagas.model.Student;
-import br.ufjf.coordenacao.OfertaVagas.model.StudentsHistory;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.EventoAceRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.*;
+import javax.inject.Inject;
+import javax.persistence.*;
+import java.util.*;
 
 @Entity
 @SequenceGenerator(name="aluno_sequencia", sequenceName="aluno_seq", allocationSize=1)  
@@ -60,18 +41,21 @@ public class Aluno implements Cloneable {
 	private int cet;
 	private boolean emAcompanhamentoAcademico;
 	private List<Float> iraUltimosTresSemestres = new ArrayList<Float>();
-	
+
 	private DisciplinaRepository disciplinaRepository;
 	private EventoAceRepository eventoAceRepository;
 
+	@Inject
+	private FacesContext facesContext;
+
 	// ==========================GETTERS_AND_SETTERS======================================================================================================//
 
-	public Object clone()throws CloneNotSupportedException{
+	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
-	
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY, generator="aluno_sequencia")  
+	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "aluno_sequencia")
 	public Long getId() {
 		return id;
 	}
@@ -173,7 +157,7 @@ public class Aluno implements Cloneable {
 			periodoInicioLocal = matricula.substring(0,4) + "1";
 		}
 		else {
-			periodoInicioLocal =  matricula.substring(0,4)  + String.valueOf(grade.getPeriodoInicio());
+			periodoInicioLocal =  matricula.substring(0,4)  + grade.getPeriodoInicio();
 		}
 		return periodoCorrente( periodoInicioLocal,periodoAtual);
 	}
@@ -247,7 +231,7 @@ public class Aluno implements Cloneable {
 		
 		if (st == null){
 			FacesMessage msg = new FacesMessage("O aluno:" + this.getMatricula() + " não tem nenhum histórico de matricula cadastrado!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
 		
@@ -516,12 +500,8 @@ public class Aluno implements Cloneable {
 		int chm = cargaHorariaTotal / numeroMedioPeriodos;
 		
 		this.calcularCet();
-		
-		if (this.cet < 1.5 * chm) {
-			this.emAcompanhamentoAcademico = true;
-		} else {
-			this.emAcompanhamentoAcademico = false;
-		}
+
+		this.emAcompanhamentoAcademico = this.cet < 1.5 * chm;
 	}
 	
 	public void calcularIraUltimosTresSemestres() {

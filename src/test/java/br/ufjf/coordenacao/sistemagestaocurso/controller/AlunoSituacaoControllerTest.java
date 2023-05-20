@@ -1,5 +1,8 @@
 package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
+import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
 import br.ufjf.coordenacao.sistemagestaocurso.utils.DataTableHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,10 +31,18 @@ class AlunoSituacaoControllerTest {
     @InjectMocks
     private AlunoSituacaoController alunoSituacaoController;
 
+    @InjectMocks
+    private Aluno alunoMock;
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        alunoSituacaoController.init();
     }
+
+    /*****
+     * resetaDataTable tests
+     */
 
     @Test
     @DisplayName("GIVEN AlunoSituacaoController WHEN resetDataTable is called THEN resets all data tables")
@@ -56,5 +67,38 @@ class AlunoSituacaoControllerTest {
             Assertions.assertTrue(dataTable.isReset());
             Assertions.assertFalse(dataTable.initialStateMarked());
         });
+    }
+
+    /*****
+     * onItemSelectMatriculaAluno tests
+     */
+
+
+    @Test
+    void onItemSelectMatriculaAlunoTest1() {
+        ArrayList<Aluno> alunoListStub = new ArrayList<>();
+        alunoListStub.add(alunoMock);
+
+        Curso cursoStub = new Curso();
+        cursoStub.setGrupoAlunos(alunoListStub);
+
+        Grade gradeStub = new Grade();
+        gradeStub.setCurso(cursoStub);
+        gradeStub.setId(1L);
+        gradeStub.setCodigo("Codigo");
+
+        alunoMock.setGrade(gradeStub);
+        alunoMock.setMatricula("201376082");
+        alunoSituacaoController.setCurso(cursoStub);
+        alunoSituacaoController.setAluno(alunoMock);
+
+        alunoSituacaoController.onItemSelectMatriculaAluno();
+
+        Assertions.assertEquals(0, alunoSituacaoController.getHorasEletivas());
+        Assertions.assertEquals(0, alunoSituacaoController.getHorasEletivasConcluidas());
+        Assertions.assertEquals(0, alunoSituacaoController.getHorasOpcionais());
+        Assertions.assertEquals(0, alunoSituacaoController.getHorasOpcionaisConcluidas());
+        Assertions.assertEquals(0, alunoSituacaoController.getHorasACE());
+        Assertions.assertEquals(0, alunoSituacaoController.getHorasObrigatoriasConcluidas());
     }
 }
