@@ -2,6 +2,9 @@ package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
 import br.ufjf.coordenacao.OfertaVagas.model.Class;
 import br.ufjf.coordenacao.OfertaVagas.model.*;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.helpers.CursoHelper;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.helpers.IHorasCurricularesConsumerHelper;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.interfaces.IHorasCurricularesConsumer;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.CalculadorMateriasExcedentes;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.Ordenar;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
@@ -27,7 +30,7 @@ import java.util.*;
 
 @Named
 @ViewScoped
-public class AlunoSituacaoController {
+public class AlunoSituacaoController implements IHorasCurricularesConsumer {
     private static final String APROVADO = "APROVADO";
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(AlunoSituacaoController.class);
@@ -163,32 +166,19 @@ public class AlunoSituacaoController {
 
     public void onItemSelectMatriculaAluno() {
 
-        for (Aluno alunoQuestao : curso.getGrupoAlunos()) {
-            if (alunoQuestao.getMatricula().contains(aluno.getMatricula())) {
-                aluno = alunoQuestao;
-                break;
-            }
-        }
-
         lgAce = false;
         lgNomeAluno = true;
         lgMatriculaAluno = true;
-        importador = estruturaArvore.recuperarArvore(aluno.getGrade(), true);
 
+        aluno = CursoHelper.getAlunoFromGrupoAlunos(aluno, curso);
         logger.info("Aluno: " + aluno.getMatricula());
-
-        Grade gradeAluno = aluno.getGrade();
-
-        horasEletivas = gradeAluno.getHorasEletivas();
-        horasOpcionais = gradeAluno.getHorasOpcionais();
-        horasACE = gradeAluno.getHorasAce();
+        importador = estruturaArvore.recuperarArvore(aluno.getGrade(), true);
 
         aluno.setDisciplinaRepository(disciplinas);
         aluno.setEventoAceRepository(eventosAceRepository);
 
-        horasObrigatoriasConcluidas = aluno.getHorasObrigatoriasCompletadas();
-        horasEletivasConcluidas = aluno.getHorasEletivasCompletadas();
-        horasOpcionaisConcluidas = aluno.getHorasOpcionaisCompletadas();
+        IHorasCurricularesConsumerHelper.setHorasCurriculares(this, aluno);
+        IHorasCurricularesConsumerHelper.setHorasCurricularesConcluidas(this, aluno);
 
         curriculum = importador.get_cur();
         StudentsHistory sh = importador.getSh();
@@ -560,10 +550,12 @@ public class AlunoSituacaoController {
         this.listaDisciplinaOpcionais = listaDisciplinaOpcionais;
     }
 
+    @Override
     public int getHorasEletivasConcluidas() {
         return horasEletivasConcluidas;
     }
 
+    @Override
     public void setHorasEletivasConcluidas(int horasEletivasConcluidas) {
         this.horasEletivasConcluidas = horasEletivasConcluidas;
     }
@@ -732,10 +724,12 @@ public class AlunoSituacaoController {
         this.lgAluno = lgAluno;
     }
 
+    @Override
     public int getHorasEletivas() {
         return horasEletivas;
     }
 
+    @Override
     public void setHorasEletivas(int horasEletivas) {
         this.horasEletivas = horasEletivas;
     }
