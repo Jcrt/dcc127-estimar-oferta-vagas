@@ -2,6 +2,9 @@ package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
 import br.ufjf.coordenacao.OfertaVagas.model.Class;
 import br.ufjf.coordenacao.OfertaVagas.model.*;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.helpers.CursoHelper;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.helpers.IHorasCurricularesConsumerHelper;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.interfaces.IHorasCurricularesConsumer;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.CalculadorMateriasExcedentes;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.Ordenar;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
@@ -29,17 +32,17 @@ import java.util.*;
 
 @Named
 @ViewScoped
-public class SimulacaoGradeController implements Serializable {
-  private static final long serialVersionUID = 1L;
-  
-  @Inject
-  private DisciplinaRepository disciplinas;
-  
-  @Inject
-  private EventoAceRepository eventosAceRepository;
-  
-  @Inject
-  private EventoAce eventoAceSelecionado;
+public class SimulacaoGradeController implements Serializable, IHorasCurricularesConsumer {
+	private static final long serialVersionUID = 1L;
+
+	@Inject
+	private DisciplinaRepository disciplinas;
+
+	@Inject
+	private EventoAceRepository eventosAceRepository;
+
+	@Inject
+	private EventoAce eventoAceSelecionado;
   
   @Inject
   private AlunoRepository alunos;
@@ -180,12 +183,7 @@ public class SimulacaoGradeController implements Serializable {
 
 	public void onItemSelectMatriculaAluno()  {
 		this.gradeSimulada = null;
-		for (Aluno alunoQuestao : curso.getGrupoAlunos()){
-			if(alunoQuestao.getMatricula().contains(aluno.getMatricula())){
-				aluno = alunoQuestao;
-				break;
-			}
-		}
+		aluno = CursoHelper.getAlunoFromGrupoAlunos(aluno, curso);
 		this.gradeSimulada = aluno.getGrade();
 		this.calculaSituacaoAluno();
 	}
@@ -399,28 +397,23 @@ public class SimulacaoGradeController implements Serializable {
 	
 	public void calculaSituacaoAluno() {
 		lgAce = false;
-		lgNomeAluno = true;	
+		lgNomeAluno = true;
 		lgGradeAluno = false;
 		lgMatriculaAluno = true;
 		//grade_aluno
-		importador = estruturaArvore.recuperarArvore(aluno.getGrade(),true);
+		importador = estruturaArvore.recuperarArvore(aluno.getGrade(), true);
 
 		logger.info("Aluno: " + aluno.getMatricula());
+		IHorasCurricularesConsumerHelper.setHorasCurriculares(this, aluno);
 
-		Grade gradeAluno = aluno.getGrade();
-		
-		horasEletivas = gradeAluno.getHorasEletivas();
-		horasOpcionais = gradeAluno.getHorasOpcionais();
-		horasACE = gradeAluno.getHorasAce();
-		
 		aluno.setDisciplinaRepository(disciplinas);
 		aluno.setEventoAceRepository(eventosAceRepository);
-		
+
 		curriculum = importador.get_cur();
-		StudentsHistory sh = importador.getSh();		
+		StudentsHistory sh = importador.getSh();
 		Student st = sh.getStudents().get(aluno.getMatricula());
 
-		if (st == null){
+		if (st == null) {
 
 			FacesMessage msg = new FacesMessage("O aluno:" + aluno.getMatricula() + " não tem nenhum histórico de matrícula cadastrado!");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -771,8 +764,7 @@ public class SimulacaoGradeController implements Serializable {
 		return listaEventosAceSelecionadas;
 	}
 
-	public void setListaEventosAceSelecionadas(
-			List<EventoAce> listaEventosAceSelecionadas) {
+	public void setListaEventosAceSelecionadas(List<EventoAce> listaEventosAceSelecionadas) {
 		this.listaEventosAceSelecionadas = listaEventosAceSelecionadas;
 	}
 

@@ -31,8 +31,14 @@ class AlunoSituacaoControllerTest {
     @InjectMocks
     private AlunoSituacaoController alunoSituacaoController;
 
-    @InjectMocks
+    @Mock
     private Aluno alunoMock;
+
+    @Mock
+    private Grade gradeMock;
+
+    @Mock
+    private Curso cursoMock;
 
     @BeforeEach
     public void setup() {
@@ -75,22 +81,9 @@ class AlunoSituacaoControllerTest {
 
 
     @Test
+    @DisplayName("GIVEN AlunoSituacaoController WHEN onItemSelectMatriculaAluno is called with no grade information THEN all hours should be 0")
     void onItemSelectMatriculaAlunoTest1() {
-        ArrayList<Aluno> alunoListStub = new ArrayList<>();
-        alunoListStub.add(alunoMock);
-
-        Curso cursoStub = new Curso();
-        cursoStub.setGrupoAlunos(alunoListStub);
-
-        Grade gradeStub = new Grade();
-        gradeStub.setCurso(cursoStub);
-        gradeStub.setId(1L);
-        gradeStub.setCodigo("Codigo");
-
-        alunoMock.setGrade(gradeStub);
-        alunoMock.setMatricula("201376082");
-        alunoSituacaoController.setCurso(cursoStub);
-        alunoSituacaoController.setAluno(alunoMock);
+        initMocks();
 
         alunoSituacaoController.onItemSelectMatriculaAluno();
 
@@ -100,5 +93,51 @@ class AlunoSituacaoControllerTest {
         Assertions.assertEquals(0, alunoSituacaoController.getHorasOpcionaisConcluidas());
         Assertions.assertEquals(0, alunoSituacaoController.getHorasACE());
         Assertions.assertEquals(0, alunoSituacaoController.getHorasObrigatoriasConcluidas());
+    }
+
+    @Test
+    @DisplayName("GIVEN AlunoSituacaoController WHEN onItemSelectMatriculaAluno is called with curricular hours defined THEN all hours should correspond definitions")
+    void onItemSelectMatriculaAlunoTest2() {
+        initMocks();
+        int horasEletivas = 10;
+        int horasOpcionais = 2;
+        int horasACE = 3;
+        int horasObrigatoriasConcluidas = 2;
+        int horasEletivasConcluidas = 9;
+        int horasOpcionaisConcluidas = 1;
+
+        Mockito.when(gradeMock.getHorasEletivas()).thenReturn(horasEletivas);
+        Mockito.when(gradeMock.getHorasOpcionais()).thenReturn(horasOpcionais);
+        Mockito.when(gradeMock.getHorasAce()).thenReturn(horasACE);
+        Mockito.when(alunoMock.getHorasObrigatoriasCompletadas()).thenReturn(horasObrigatoriasConcluidas);
+        Mockito.when(alunoMock.getHorasEletivasCompletadas()).thenReturn(horasEletivasConcluidas);
+        Mockito.when(alunoMock.getHorasOpcionaisCompletadas()).thenReturn(horasOpcionaisConcluidas);
+
+        alunoSituacaoController.onItemSelectMatriculaAluno();
+
+        Assertions.assertEquals(horasEletivas, alunoSituacaoController.getHorasEletivas());
+        Assertions.assertEquals(horasEletivasConcluidas, alunoSituacaoController.getHorasEletivasConcluidas());
+        Assertions.assertEquals(horasOpcionais, alunoSituacaoController.getHorasOpcionais());
+        Assertions.assertEquals(horasOpcionaisConcluidas, alunoSituacaoController.getHorasOpcionaisConcluidas());
+        Assertions.assertEquals(horasACE, alunoSituacaoController.getHorasACE());
+        Assertions.assertEquals(horasObrigatoriasConcluidas, alunoSituacaoController.getHorasObrigatoriasConcluidas());
+    }
+
+    /**
+     * Method that initializes the main mocks
+     */
+    private void initMocks() {
+        ArrayList<Aluno> alunoListStub = new ArrayList<>();
+        alunoListStub.add(alunoMock);
+
+        Mockito.when(cursoMock.getGrupoAlunos()).thenReturn(alunoListStub);
+        Mockito.when(gradeMock.getCurso()).thenReturn(cursoMock);
+        Mockito.when(gradeMock.getId()).thenReturn(1L);
+        Mockito.when(gradeMock.getCodigo()).thenReturn("Codigo");
+        Mockito.when(alunoMock.getGrade()).thenReturn(gradeMock);
+        Mockito.when(alunoMock.getMatricula()).thenReturn("201376082");
+
+        alunoSituacaoController.setCurso(cursoMock);
+        alunoSituacaoController.setAluno(alunoMock);
     }
 }
