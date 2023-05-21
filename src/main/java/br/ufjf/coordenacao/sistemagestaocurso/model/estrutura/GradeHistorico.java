@@ -1,13 +1,12 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class GradeHistorico {
-	
-	
+
 	private String nome;
 	private String matricula;
-	private ArrayList<String> historicoAluno;
+	private List<String> historicoAluno;
 	private String opcionaisSituacaoDisciplina;	
 
 	public String getOpcionaisSituacaoDisciplina() {
@@ -18,19 +17,19 @@ public class GradeHistorico {
 		this.opcionaisSituacaoDisciplina = opcionaisSituacaoDisciplina;
 	}
 
-	public GradeHistorico(ArrayList<String> historicoAluno,String opcionaisSituacaoDisciplina,String nome,String matricula) {
+	public GradeHistorico(List<String> historicoAluno, String opcionaisSituacaoDisciplina, String nome, String matricula) {
 
 		this.historicoAluno = historicoAluno;
-		this.opcionaisSituacaoDisciplina = opcionaisSituacaoDisciplina;  
+		this.opcionaisSituacaoDisciplina = opcionaisSituacaoDisciplina;
 		this.nome = nome;
 		this.matricula = matricula;
 	}
 
-	public ArrayList<String> getHistoricoAluno() {
+	public List<String> getHistoricoAluno() {
 		return historicoAluno;
 	}
 
-	public void setHistoricoAluno(ArrayList<String> historicoAluno) {
+	public void setHistoricoAluno(List<String> historicoAluno) {
 		this.historicoAluno = historicoAluno;
 	}
 

@@ -4,7 +4,6 @@ import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
 import br.ufjf.coordenacao.sistemagestaocurso.model.GradeDisciplina;
 
 public class DisciplinaGradeDisciplina {
-	
 	private GradeDisciplina gradeDisciplina;
 	private Disciplina disciplina;	
 	

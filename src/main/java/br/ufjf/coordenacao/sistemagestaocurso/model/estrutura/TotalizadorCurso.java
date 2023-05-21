@@ -3,12 +3,10 @@ package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class TotalizadorCurso {
 	
 	private String gradeIngresso;
-	private List<Integer> listaTotalizados = new ArrayList<Integer>();	
+	private List<Integer> listaTotalizados = new ArrayList<>();
 
 	public List<Integer> getListaTotalizados() {
 		return listaTotalizados;

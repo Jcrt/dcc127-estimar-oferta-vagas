@@ -1,15 +1,14 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
+import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
-
 public class ElementoGrafico {
-	
 	private Integer numero;
 	private Float ira;
-	private List<Aluno> listaAluno = new ArrayList<Aluno>();	
+	private List<Aluno> listaAluno = new ArrayList<>();
 	
 	public Integer getNumero() {
 		return numero;
@@ -29,9 +28,4 @@ public class ElementoGrafico {
 	public void setIra(Float ira) {
 		this.ira = ira;
 	}
-	
-	
-	
-	
-	
 }

@@ -1,31 +1,35 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ListaPeriodoAluno {
 
-	
-	private String IngressoAlunos;
+	private String ingressoAlunos;
 	private Integer maximoEncontrado;
-	private ArrayList<PeriodoAluno> listaPeriodoAluno = new ArrayList<PeriodoAluno>();	
-	
+	private List<PeriodoAluno> listaPeriodo = new ArrayList<>();
+
 	public String getIngressoAlunos() {
-		return IngressoAlunos;
+		return ingressoAlunos;
 	}
+
 	public void setIngressoAlunos(String ingressoAlunos) {
-		IngressoAlunos = ingressoAlunos;
+		this.ingressoAlunos = ingressoAlunos;
 	}
-	public ArrayList<PeriodoAluno> getListaPeriodoAluno() {
-		return listaPeriodoAluno;
+
+	public List<PeriodoAluno> getListaPeriodo() {
+		return listaPeriodo;
 	}
-	public void setListaPeriodoAluno(ArrayList<PeriodoAluno> listaPeriodoAluno) {
-		this.listaPeriodoAluno = listaPeriodoAluno;
+
+	public void setListaPeriodo(List<PeriodoAluno> listaPeriodo) {
+		this.listaPeriodo = listaPeriodo;
 	}
-	
+
 	public Integer getMaximoEncontrado() {
 		return maximoEncontrado;
 	}
+
 	public void setMaximoEncontrado(Integer maximoEncontrado) {
 		this.maximoEncontrado = maximoEncontrado;
-	}	
+	}
 }

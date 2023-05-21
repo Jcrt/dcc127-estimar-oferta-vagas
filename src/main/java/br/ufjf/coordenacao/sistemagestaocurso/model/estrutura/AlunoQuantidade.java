@@ -1,15 +1,15 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AlunoQuantidade {
 
 	private Aluno aluno;
-	private List<Disciplina> listaDisciplina = new ArrayList<Disciplina>();	
+	private List<Disciplina> listaDisciplina = new ArrayList<>();
 	
 	public Aluno getAluno() {
 		return aluno;

@@ -4,28 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TurmaAlunos {
-	
 	private int quantidadeTotal;
-	private String IngressoAlunos;
-	private List<AprovacoesQuantidade> listaAprovacoesQuantidade = new ArrayList<AprovacoesQuantidade>();	
-	
+	private final List<AprovacoesQuantidade> listaAprovacoesQuantidade = new ArrayList<>();
+	private String ingressoAlunos;
+
 	public int getQuantidadeTotal() {
 		return quantidadeTotal;
 	}
+
 	public void setQuantidadeTotal(int quantidadeTotal) {
 		this.quantidadeTotal = quantidadeTotal;
 	}
+
 	public String getIngressoAlunos() {
-		return IngressoAlunos;
+		return ingressoAlunos;
 	}
 	public void setIngressoAlunos(String ingressoAlunos) {
-		IngressoAlunos = ingressoAlunos;
+		this.ingressoAlunos = ingressoAlunos;
 	}
 	public List<AprovacoesQuantidade> getListaAprovacoesQuantidade() {
 		return listaAprovacoesQuantidade;
-	}
-	public void setListaAprovacoesQuantidade(
-			List<AprovacoesQuantidade> listaAprovacoesQuantidade) {
-		this.listaAprovacoesQuantidade = listaAprovacoesQuantidade;
 	}
 }

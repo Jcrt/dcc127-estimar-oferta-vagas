@@ -1,21 +1,20 @@
 package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import br.ufjf.coordenacao.sistemagestaocurso.model.*;
+import br.ufjf.coordenacao.OfertaVagas.model.Class;
+import br.ufjf.coordenacao.OfertaVagas.model.*;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.util.Ordenar;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.AlunoSelecionado;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.ListaPeriodoAluno;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.PeriodoAluno;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.TotalizadorCurso;
-
+import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
+import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import org.apache.log4j.Logger;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -28,17 +27,14 @@ import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.chart.HorizontalBarChartModel;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-
-import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.*;
-import br.ufjf.coordenacao.OfertaVagas.model.Curriculum;
-import br.ufjf.coordenacao.OfertaVagas.model.Student;
-import br.ufjf.coordenacao.OfertaVagas.model.StudentsHistory;
-import br.ufjf.coordenacao.OfertaVagas.model.Class;
-import br.ufjf.coordenacao.OfertaVagas.model.ClassStatus;
-import br.ufjf.coordenacao.sistemagestaocurso.controller.util.Ordenar;
-import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
+import javax.annotation.PostConstruct;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 //import br.ufjf.coordenacao.sistemagestaocurso.repository.AlunoRepository;
 
 @Named
@@ -50,24 +46,24 @@ public class GraficosController implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Curriculum curriculum;
 	private ImportarArvore importador;
-	private EstruturaArvore estruturaArvore;	
-	
+	private final Ordenar ordenar = new Ordenar();
+
 	private Curso curso = new Curso();
 	private int maximoEncontrado;
 	private int quantidadeSelecionados;
 	private int periodoSelecionados;
 	private int quantidadeTotal;
 	private HorizontalBarChartModel animatedModel2;
-	private Ordenar ordenar = new Ordenar();
-	private GChartType chartType = GChartType.PIE;
+	private final GChartType chartType = GChartType.PIE;
+	private EstruturaArvore estruturaArvore;
 	private GChartModel chartModel = null;
 	private List<ListaPeriodoAluno> listaDados = new ArrayList<ListaPeriodoAluno>();
 	private List<TotalizadorCurso> listaTotalizada = new ArrayList<TotalizadorCurso>();
 	private List<AlunoSelecionado> listaAlunoSelecionado = new ArrayList<AlunoSelecionado>();
-	private List<AlunoSelecionado> listaAlunoSelecionadoFiltrados ;
+	private List<AlunoSelecionado> listaAlunoSelecionadoFiltrados;
 	private List<ColumnModel> columns;
 	private boolean semColuna = true;
-	
+
 	private static final Logger logger = Logger.getLogger(GraficosController.class);
 
 	/*@Inject
@@ -144,35 +140,35 @@ public class GraficosController implements Serializable {
 		while(i != (maximoEncontrado + 1)){
 			int contadorAluno = 0;
 			ChartSeries f = new ChartSeries();
-			f.setLabel(String.valueOf(i) + "° - Período Incompleto");
-			for(ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados){
-				ordenar.PeriodoAlunoPorPeriodoGeral(listaPeriodoAlunoSelecionado.getListaPeriodoAluno());
+			f.setLabel(i + "° - Período Incompleto");
+			for(ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados) {
+				ordenar.PeriodoAlunoPorPeriodoGeral(listaPeriodoAlunoSelecionado.getListaPeriodo());
 				boolean naoEntrou = false;
 				List<Integer> listaTotalizados = new ArrayList<Integer>();
 				int quantidadeAlunos = 0;
 				int contador = 1;
-				for (PeriodoAluno periodoAlunoSelecionado : listaPeriodoAlunoSelecionado.getListaPeriodoAluno()){
-					if(periodoAlunoSelecionado.getPeriodoReal() == i ){
+				for (PeriodoAluno periodoAlunoSelecionado : listaPeriodoAlunoSelecionado.getListaPeriodo()) {
+					if (periodoAlunoSelecionado.getPeriodoReal() == i) {
 						contadorAluno = contadorAluno + periodoAlunoSelecionado.getListaAlunosPeriodo().size();
 						f.set((listaPeriodoAlunoSelecionado.getIngressoAlunos()), periodoAlunoSelecionado.getListaAlunosPeriodo().size());
 						naoEntrou = true;
-						if(naoEntrouPrimeira == true) break;
+						if (naoEntrouPrimeira) break;
 					}
-					if(naoEntrouPrimeira == false){
-						while(contador != periodoAlunoSelecionado.getPeriodoReal()){
+					if (!naoEntrouPrimeira) {
+						while (contador != periodoAlunoSelecionado.getPeriodoReal()) {
 							listaTotalizados.add(0);
 							contador++;
 						}
 						listaTotalizados.add(periodoAlunoSelecionado.getListaAlunosPeriodo().size());
 						quantidadeAlunos = quantidadeAlunos + periodoAlunoSelecionado.getListaAlunosPeriodo().size();
 					}
-					contador ++ ;
+					contador++;
 				}
-				if(naoEntrouPrimeira == false){
+				if (!naoEntrouPrimeira) {
 					int contadorTam;
-					if (listaTotalizados.size() != maximoEncontrado){
+					if (listaTotalizados.size() != maximoEncontrado) {
 						contadorTam = listaTotalizados.size();
-						while(contadorTam != (maximoEncontrado)){
+						while (contadorTam != (maximoEncontrado)) {
 							listaTotalizados.add(0);
 							contadorTam++;
 						}
@@ -186,24 +182,23 @@ public class GraficosController implements Serializable {
 						int soma;
 						if (listaTotalizadosAcumulados.size() == 0 || listaTotalizadosAcumulados.size() == contTotais) {
 							soma = inteiro;
-							listaTotalizadosAcumulados.add(soma);								
-						}
-						else{
+							listaTotalizadosAcumulados.add(soma);
+						} else {
 							soma = inteiro + listaTotalizadosAcumulados.get(contTotais);
 							listaTotalizadosAcumulados.set(contTotais, soma);
 						}
-						contTotais ++;
+						contTotais++;
 					}
 					listaTotalizada.add(totalizadorCurso);
 				}
-				if (naoEntrou == false){
+				if (!naoEntrou) {
 					f.set((listaPeriodoAlunoSelecionado.getIngressoAlunos()), 0);
 				}
 			}
 			naoEntrouPrimeira = true;
 			
 			//if(i != curso.gr)
-			gChartModelBuilder.addRow(String.valueOf(i) + "° - Período Incompleto", contadorAluno);
+			gChartModelBuilder.addRow(i + "° - Período Incompleto", contadorAluno);
 			model.addSeries(f);
 			i++;
 		}
@@ -266,15 +261,15 @@ public class GraficosController implements Serializable {
 		return listaPeriodoAlunoNova;
 	}
 
-	public PeriodoAluno buscarListaPeriodoReal(ListaPeriodoAluno listaPeriodoAluno,Integer periodoReal){
-		for(PeriodoAluno periodoAlunoSelecionado : listaPeriodoAluno.getListaPeriodoAluno()){
-			if(periodoAlunoSelecionado.getPeriodoReal() == periodoReal){
-				return periodoAlunoSelecionado;												
-			}					
+	public PeriodoAluno buscarListaPeriodoReal(ListaPeriodoAluno listaPeriodoAluno,Integer periodoReal) {
+		for (PeriodoAluno periodoAlunoSelecionado : listaPeriodoAluno.getListaPeriodo()) {
+			if (periodoAlunoSelecionado.getPeriodoReal() == periodoReal) {
+				return periodoAlunoSelecionado;
+			}
 		}
 		PeriodoAluno periodoAlunoNova = new PeriodoAluno();
 		periodoAlunoNova.setPeriodoReal(periodoReal);
-		listaPeriodoAluno.getListaPeriodoAluno().add(periodoAlunoNova);
+		listaPeriodoAluno.getListaPeriodo().add(periodoAlunoNova);
 		return periodoAlunoNova;
 	}
 
@@ -296,10 +291,10 @@ public class GraficosController implements Serializable {
 	public void itemSelect(ItemSelectEvent event) {
 		quantidadeTotal = 0;
 		listaAlunoSelecionado = new ArrayList<AlunoSelecionado>();
-		for (PeriodoAluno periodoAluno : listaDados.get(event.getItemIndex()).getListaPeriodoAluno()){
+		for (PeriodoAluno periodoAluno : listaDados.get(event.getItemIndex()).getListaPeriodo()) {
 			quantidadeTotal = quantidadeTotal + periodoAluno.getListaAlunosPeriodo().size();
-			if (periodoAluno.getPeriodoReal() == (event.getSeriesIndex() + 1)){
-				for(Aluno alunoQuestao : periodoAluno.getListaAlunosPeriodo()){
+			if (periodoAluno.getPeriodoReal() == (event.getSeriesIndex() + 1)) {
+				for (Aluno alunoQuestao : periodoAluno.getListaAlunosPeriodo()) {
 					AlunoSelecionado alunoSelecionado = new AlunoSelecionado();
 					alunoSelecionado.setGradeIngresso((listaDados.get(event.getItemIndex()).getIngressoAlunos()));
 					alunoSelecionado.setMatricula(alunoQuestao.getMatricula());
@@ -323,10 +318,10 @@ public class GraficosController implements Serializable {
 			selecionado = Integer.valueOf(label.substring(0,1));
 		}
 		listaAlunoSelecionado = new ArrayList<AlunoSelecionado>();
-		for(ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados){
-			for (PeriodoAluno periodoAluno : listaPeriodoAlunoSelecionado.getListaPeriodoAluno()){
-				if (periodoAluno.getPeriodoReal() == (selecionado)){
-					for(Aluno alunoQuestao : periodoAluno.getListaAlunosPeriodo()){
+		for(ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados) {
+			for (PeriodoAluno periodoAluno : listaPeriodoAlunoSelecionado.getListaPeriodo()) {
+				if (periodoAluno.getPeriodoReal() == (selecionado)) {
+					for (Aluno alunoQuestao : periodoAluno.getListaAlunosPeriodo()) {
 						AlunoSelecionado alunoSelecionado = new AlunoSelecionado();
 						alunoSelecionado.setGradeIngresso((listaPeriodoAlunoSelecionado.getIngressoAlunos()));
 						alunoSelecionado.setMatricula(alunoQuestao.getMatricula());
@@ -355,17 +350,18 @@ public class GraficosController implements Serializable {
 		}
 	}
 
-	static public class ColumnModel implements Serializable {  
+	static public class ColumnModel implements Serializable {
 		private static final long serialVersionUID = 1L;
-		private String header;  
-		private int mes;  
-		public ColumnModel(String header, int mes) {  
-			this.header = header;  
-			this.mes = mes;
-		}  
+		private final String header;
+		private final int mes;
 
-		public String getHeader() {  
-			return header;  
+		public ColumnModel(String header, int mes) {
+			this.header = header;
+			this.mes = mes;
+		}
+
+		public String getHeader() {
+			return header;
 		}
 
 		public Integer retornaProperty(TotalizadorCurso c) {  
