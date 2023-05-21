@@ -24,9 +24,10 @@ Repositório com a versão web do sistema, para aplicação de técnicas de enge
 	JDBC.PASSWORD = <senha do usuário do banco de dados>
 	JDBC.DRIVER = com.mysql.jdbc.Driver
 	```
-## Como fazer
+## 🆘 Como fazer
 Esta seção é dedicada a detalhes de 'como fazer' dentro do projeto.
 Os documentos aqui contidos estão dentro da nossa página de Wiki. 
 Vai lá dá uma lida, sô!
 
 1. [🧪 [Definições] Testes unitários](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%A7%AA-%5BDefini%C3%A7%C3%B5es%5D-Testes-unit%C3%A1rios)
+2. [👣 [Definições] Branches, commits e pull requests](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%91%A3-%5BDefini%C3%A7%C3%B5es%5D-Branches,-commits-e-pull-requests)
