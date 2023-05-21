@@ -6,7 +6,7 @@ import java.util.List;
 public class GrupoElementoGrafico {
 	
 	private Integer grade;
-	private List<ElementoGrafico> listaElementoGrafico = new ArrayList<ElementoGrafico>();
+	private List<ElementoGrafico> listaElementoGrafico = new ArrayList<>();
 	
 	public Integer getGrade() {
 		return grade;

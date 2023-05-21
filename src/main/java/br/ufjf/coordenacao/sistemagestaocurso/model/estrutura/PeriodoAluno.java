@@ -1,19 +1,20 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
-import java.util.ArrayList;
-
 import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
 
-public class PeriodoAluno {	
-	
-	private Integer periodoReal;
-	private ArrayList<Aluno> listaAlunosPeriodo = new ArrayList<Aluno>();
+import java.util.ArrayList;
+import java.util.List;
 
-	public ArrayList<Aluno> getListaAlunosPeriodo() {
+public class PeriodoAluno {
+
+	private Integer periodoReal;
+	private List<Aluno> listaAlunosPeriodo = new ArrayList<>();
+
+	public List<Aluno> getListaAlunosPeriodo() {
 		return listaAlunosPeriodo;
 	}
 
-	public void setListaAlunosPeriodo(ArrayList<Aluno> listaAlunosPeriodo) {
+	public void setListaAlunosPeriodo(List<Aluno> listaAlunosPeriodo) {
 		this.listaAlunosPeriodo = listaAlunosPeriodo;
 	}
 

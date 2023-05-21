@@ -1,7 +1,6 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
 public class AlunoSituacao {
-	
 	private String matricula;
 	private String nome;
 	private int quantidadeReprovacoesNota;
@@ -45,6 +44,4 @@ public class AlunoSituacao {
 	public void setQuantidadeAprovados(int quantidadeAprovados) {
 		this.quantidadeAprovados = quantidadeAprovados;
 	}
-	
-	
 }

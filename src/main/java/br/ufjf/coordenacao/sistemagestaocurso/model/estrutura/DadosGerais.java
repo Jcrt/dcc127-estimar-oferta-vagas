@@ -1,15 +1,12 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
 public class DadosGerais {
-	
 	private String codigoCurso;
 	private String dataUltimaImportacao;
 	private Integer alunosTotaisCurso;
 	private String gradeCurso;
 	private Integer quantidadeAlunosGrade;
-	
-	
-	
+
 	public String getCodigoCurso() {
 		return codigoCurso;
 	}
