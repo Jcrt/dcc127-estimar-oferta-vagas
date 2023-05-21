@@ -1,16 +1,15 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Pessoa;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Autenticacao {
-	
 	private String login;
 	private String senha;
-	private List<String> perfis = new ArrayList<String>();	
+	private List<String> perfis = new ArrayList<>();
 	private String token;
 	private Pessoa pessoa;
 	private String tipoAcesso;
@@ -18,24 +17,20 @@ public class Autenticacao {
 	private String selecaoCurso;
 	private Curso cursoSelecionado;
 	private String semestreSelecionado;
-	private List<String> perfisCursos = new ArrayList<String>();
+	private List<String> perfisCursos = new ArrayList<>();
 	private String maiorPermissao;
 	
 	public Autenticacao(){}
-	
-	
+
 	public Autenticacao(String login,String senha){
-		
 		this.senha =  senha;
 		this.login = login;
-		
-		
 	}
 	
 	public String getLogin() {
-	
 		return login;
 	}
+
 	public void setLogin(String login) {
 		this.login = login;
 	}

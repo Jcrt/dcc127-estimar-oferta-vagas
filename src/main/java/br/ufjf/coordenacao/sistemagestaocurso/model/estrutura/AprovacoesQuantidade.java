@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AprovacoesQuantidade {
-	
 	private Integer quantidadeAprovacoes;
 	private float percentualAprovados;
-	private List<AlunoQuantidade> listaAlunoQuantidade = new ArrayList<AlunoQuantidade>();
+	private List<AlunoQuantidade> listaAlunoQuantidade = new ArrayList<>();
 	
 	public Integer getQuantidadeAprovacoes() {
 		return quantidadeAprovacoes;

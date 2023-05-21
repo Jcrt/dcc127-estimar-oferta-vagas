@@ -78,8 +78,6 @@ class AlunoSituacaoControllerTest {
     /*****
      * onItemSelectMatriculaAluno tests
      */
-
-
     @Test
     @DisplayName("GIVEN AlunoSituacaoController WHEN onItemSelectMatriculaAluno is called with no grade information THEN all hours should be 0")
     void onItemSelectMatriculaAlunoTest1() {

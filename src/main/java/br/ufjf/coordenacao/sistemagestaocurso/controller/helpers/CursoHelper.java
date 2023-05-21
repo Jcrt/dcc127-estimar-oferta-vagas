@@ -14,7 +14,6 @@ public class CursoHelper {
 
 	/**
 	 * Pesquisa, dentro do grupo de alunos do {@link Curso} informado, se o {@link Aluno} existe
-	 *
 	 * @param searchedAluno O aluno informado
 	 * @param currentCurso  O curso informado
 	 * @return O aluno pertencente ao curso

@@ -1,7 +1,6 @@
 package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
 public class DisciplinaPlanejamento {
-	
 	private String codigo;
 	private Integer cargaHoraria;
 	private String cor;	

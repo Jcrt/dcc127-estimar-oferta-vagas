@@ -2,25 +2,26 @@ package br.ufjf.coordenacao.sistemagestaocurso.model.estrutura;
 
 import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
 
-public class AlunoSelecionado {	
-	
+public class AlunoSelecionado {
 	private String gradeIngresso;
-	private Integer PeriodoCorrente;
+	private Integer periodoCorrente;
 	private String matricula;
 	private String nomeAluno;
-	private Aluno aluno;	
-	
+	private Aluno aluno;
+
 	public String getGradeIngresso() {
 		return gradeIngresso;
 	}
+
 	public void setGradeIngresso(String gradeIngresso) {
 		this.gradeIngresso = gradeIngresso;
 	}
+
 	public Integer getPeriodoCorrente() {
-		return PeriodoCorrente;
+		return periodoCorrente;
 	}
 	public void setPeriodoCorrente(Integer periodoCorrente) {
-		PeriodoCorrente = periodoCorrente;
+		this.periodoCorrente = periodoCorrente;
 	}
 	public String getMatricula() {
 		return matricula;
