@@ -9,6 +9,7 @@ Repositório com a versão web do sistema, para aplicação de técnicas de enge
 - [Sonarqube](https://docs.sonarqube.org/latest/)
 
 ###### *A escolha da versão do Java 17 é em função de [pré-requisito do Sonarqube](https://docs.sonarqube.org/latest/requirements/prerequisites-and-overview/).
+###### **A instalação do Sonarqube é opcional, caso seja necessário executar as análises de código-fonte na sua máquina local
 
 ## ⚙️ Configurações 
 #### Para configurar o ambiente alguns detalhes devem ser observados.
@@ -31,3 +32,4 @@ Vai lá dá uma lida, sô!
 
 1. [🧪 [Definições] Testes unitários](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%A7%AA-%5BDefini%C3%A7%C3%B5es%5D-Testes-unit%C3%A1rios)
 2. [👣 [Definições] Branches, commits e pull requests](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%91%A3-%5BDefini%C3%A7%C3%B5es%5D-Branches,-commits-e-pull-requests)
+3. [🤖 [Definições] GitHub Actions (CI CD)](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%A4%96-%5BDefini%C3%A7%C3%B5es%5D-GitHub-Actions-(CI-CD))
