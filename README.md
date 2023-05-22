@@ -1,3 +1,5 @@
+[![(Maven) Build, test and analyze](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/actions/workflows/maven.yml/badge.svg)](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/actions/workflows/maven.yml)
+
 # 🖥️EstimarOfertaVagas-Web
 Repositório com a versão web do sistema, para aplicação de técnicas de engenharia de software para trabalho de conclusão de curso.
 
