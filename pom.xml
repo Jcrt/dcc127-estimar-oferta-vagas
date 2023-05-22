@@ -326,19 +326,7 @@
 		</repository>
 
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>myPluginRepo</id>
-			<name>My Plugins repo</name>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<url>https://repo1.maven.org/maven2/</url>
-		</pluginRepository>
-	</pluginRepositories>
+
 	<build>
 		<plugins>
 			<plugin>
