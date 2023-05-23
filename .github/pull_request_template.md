@@ -13,6 +13,7 @@
 - [ ] 🐱‍🚀 Testes unitários
 - [ ] 🐱‍👤 Aplicação de design pattern
 - [ ] 📄 Documentaçao
+- [ ] 🤖 Automatização (CI/CD)
 
 #### Observações relevantes
 [Preencha aqui caso haja observações relevantes acerca do seu pull request]
