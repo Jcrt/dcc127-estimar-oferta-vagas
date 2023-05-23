@@ -34,4 +34,9 @@ Vai lá dá uma lida, sô!
 
 1. [🧪 [Definições] Testes unitários](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%A7%AA-%5BDefini%C3%A7%C3%B5es%5D-Testes-unit%C3%A1rios)
 2. [👣 [Definições] Branches, commits e pull requests](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%91%A3-%5BDefini%C3%A7%C3%B5es%5D-Branches,-commits-e-pull-requests)
-3. [🤖 [Definições] GitHub Actions (CI CD)](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%A4%96-%5BDefini%C3%A7%C3%B5es%5D-GitHub-Actions-(CI-CD))
+3. [🤖 [Definições] GitHub Actions (CI \ CD)](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%A4%96-%5BDefini%C3%A7%C3%B5es%5D-GitHub-Actions-(CI-%5C-CD))
+
+##### Legenda
+- 🧪 Testes
+- 👣 Branches e fluxo de desenvolvimento
+- 🤖 Continuous integration, deployment e delivery
