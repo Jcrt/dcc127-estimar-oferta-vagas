@@ -14,84 +14,65 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
-	<dependencies>   
-		<!-- Usado para geração de arquivos Excel -->
+	<dependencies>
 		<dependency>
-		    <groupId>org.apache.poi</groupId>
-		    <artifactId>poi</artifactId>
-		    <version>5.2.2</version>
-		    <scope>compile</scope>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.2.2</version>
+			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-resources-plugin</artifactId>
 			<version>3.3.0</version>
 		</dependency>
-    
-		<!-- Implementacao do Bean Validation -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>8.0.0.Final</version>
 			<scope>compile</scope>
 		</dependency>
-    
-		<!-- Núcleo do Hibernate -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>6.1.6.Final</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- Implementação de EntityManager da JPA -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>4.2.3.Final</version>
 			<scope>compile</scope>
 		</dependency>
-
-		<!-- Pool de conexoes com C3P0 -->
 		<dependency>
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-c3p0</artifactId>
 		    <version>6.1.6.Final</version>
 		    <scope>compile</scope>
 		</dependency>
-		
 		<dependency>
     		<groupId>org.apache.poi</groupId>
     		<artifactId>poi-ooxml</artifactId>
     		<version>5.2.2</version>
 		</dependency>
-
-		<!-- Driver JDBC do MySQL -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.30</version>
 			<scope>compile</scope>
 		</dependency>
-    
-        <!-- Weld (implementação do CDI) -->
-        <dependency>
-            <groupId>org.jboss.weld.servlet</groupId>
-            <artifactId>weld-servlet</artifactId>
-            <version>1.1.10.Final</version>
-            <scope>compile</scope>
-        </dependency>
-        
-        <!-- Weld depende do Jandex -->
+		<dependency>
+			<groupId>org.jboss.weld.servlet</groupId>
+			<artifactId>weld-servlet</artifactId>
+			<version>1.1.10.Final</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.jboss</groupId>
-		    <artifactId>jandex</artifactId>
-		    <version>3.0.5</version>
-		    <scope>compile</scope>
-		</dependency> 
-    
-        <!-- PrimeFaces (biblioteca de componentes) -->
+			<artifactId>jandex</artifactId>
+			<version>3.0.5</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.primefaces</groupId>
 			<artifactId>primefaces</artifactId>
@@ -102,148 +83,107 @@
 			<artifactId>primefaces-extensions</artifactId>
 			<version>12.0.0</version>
 		</dependency>
-
-        <!-- Bootstrap componentes Primefaces -->
 		<dependency>
 			<groupId>org.primefaces.themes</groupId>
 			<artifactId>bootstrap</artifactId>
 			<version>1.0.10</version>
 		</dependency>
-
-		<!-- Mojarra (implementacao do JSF) -->
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.faces</artifactId>
             <version>2.4.0</version>
             <scope>compile</scope>
         </dependency>
-        
-<!-- 		OmniFaces (utilitarios para JSF) -->
-<!-- 		<dependency> -->
-<!-- 		    <groupId>org.omnifaces</groupId> -->
-<!-- 		    <artifactId>omnifaces</artifactId> -->
-<!-- 		    <version>2.0</version> -->
-<!-- 		    <scope>compile</scope> -->
-<!-- 		</dependency> -->		
-		
-		<!-- Implementação do Phrase -->
 		<dependency>
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>4.2.2</version>
 		</dependency>
-        
-		<!-- Log4J -->    	
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- Commons Logging (abstrai a implementação de logging) -->
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.2</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- Commons Lang (utilidades) -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.12.0</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- Abstração para envio de e-mails -->		
 		<dependency>
 			<groupId>com.outjected</groupId>
 			<artifactId>simple-email</artifactId>
 			<version>0.2.5-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-
-		<!-- Requerido para envio de e-mails -->
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4.7</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- Usamos para templates de emails -->
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
 			<version>1.7</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- Usamos para formatar números em templates -->
 		<dependency>
 			<groupId>velocity-tools</groupId>
 			<artifactId>velocity-tools-generic</artifactId>
 			<version>1.1</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- Spring Security (autenticação e autorização) -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<version>5.7.3</version>
-		</dependency> 
+			<version>5.7.7</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>5.7.3</version>
-		</dependency> 
+			<version>5.7.7</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 			<version>5.7.3</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>6.20.0</version>
 			<scope>compile</scope>
 		</dependency>
-		
-		<!-- API de Servlet -->
 		<dependency>
 	        <groupId>javax.servlet</groupId>
 	        <artifactId>javax.servlet-api</artifactId>
 	        <version>4.0.1</version>
 	        <scope>provided</scope>
 		</dependency>
-		
-		<!-- EstimarOfertaVagas -->
-		
-		<!-- Apache CXF JAX-RS (requerido pelo Integra) -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxrs</artifactId>
 			<version>3.5.5</version>
 			<type>jar</type>
 		</dependency>
-
 		<dependency>
   			<groupId>org.apache.cxf</groupId>
   			<artifactId>cxf-rt-rs-client</artifactId>
   			<version>3.0.0-milestone1</version>
 		</dependency>
-
 		<dependency>
 			<groupId>net.sf.m-m-m</groupId>
 			<artifactId>mmm-util-backport-java.util.function</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-
-		<!-- Apache Commons IO -->
 		<dependency>
     		<groupId>commons-io</groupId>
     		<artifactId>commons-io</artifactId>
@@ -270,13 +210,6 @@
 			<version>2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>estimar-oferta-vagas</groupId>
-			<artifactId>estimar-oferta-vagas-2019</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/estimar-oferta-vagas/estimar-oferta-vagas-2019/1.0.0/estimar-oferta-vagas-2019-1.0.0.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>5.3.1</version>
@@ -285,13 +218,53 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>RELEASE</version>
+			<version>5.10.0-M1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.sonarsource.scanner.maven</groupId>
 			<artifactId>sonar-maven-plugin</artifactId>
 			<version>3.9.1.2184</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<version>3.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-war-plugin</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>estimar-oferta-vagas</groupId>
+			<artifactId>estimar-oferta-vagas-2019</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>
+				${project.basedir}/libs/estimar-oferta-vagas/estimar-oferta-vagas-2019/1.0.0/estimar-oferta-vagas-2019-1.0.0.jar
+			</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-site-plugin</artifactId>
+			<version>4.0.0-M8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-project-info-reports-plugin</artifactId>
+			<version>3.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-failsafe-plugin</artifactId>
+			<version>3.1.0</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -302,13 +275,11 @@
 			<url>https://repository.primefaces.org</url>
 			<layout>default</layout>
 		</repository>
-
 		<repository>
 			<id>souzajbr-mvn-repo</id>
 			<name>SouzaJBR MVN Repo</name>
 			<url>https://github.com/SouzaJBR/mvn-repo/raw/master/</url>
 		</repository>
-		
 		<repository>
         	<id>spring-milestones</id>
         	<name>Spring Milestones</name>
@@ -317,19 +288,16 @@
             	<enabled>false</enabled>
        		</snapshots>
     	</repository>
-
 		<repository>
 			<id>central</id>
 			<name>Maven Central</name>
 			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
-
 		<repository>
-			<id>gmaven</id>
+			<id>google-maven</id>
 			<name>Google Maven</name>
 			<url>https://maven.google.com/</url>
 		</repository>
-
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -367,43 +335,83 @@
 				<version>3.3.2</version>
 			</plugin>
 			<plugin>
-				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.9.1.2184</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<argLine>
+						--illegal-access=permit
+					</argLine>
+					<testFailureIgnore>true</testFailureIgnore>
+					<forkCount>2</forkCount>
+					<reuseForks>true</reuseForks>
+					<argLine>${surefireArgLine}</argLine>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.7</version>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
+							<propertyName>surefireArgLine</propertyName>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-check</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>COMPLEXITY</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.70</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>4.0.0-M8</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>3.4.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.1.0</version>
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>coverage</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.7</version>
-						<executions>
-							<execution>
-								<id>prepare-agent</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>report</id>
-								<goals>
-									<goal>report</goal>
-								</goals>
-								<configuration>
-									<formats>
-										<format>XML</format>
-									</formats>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
