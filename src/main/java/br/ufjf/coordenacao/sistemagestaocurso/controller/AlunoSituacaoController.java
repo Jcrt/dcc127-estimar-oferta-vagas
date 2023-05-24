@@ -25,12 +25,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.Serializable;
 import java.text.Normalizer;
 import java.util.*;
 
 @Named
 @ViewScoped
-public class AlunoSituacaoController implements IHorasCurricularesConsumer {
+public class AlunoSituacaoController
+        implements IHorasCurricularesConsumer, Serializable {
     private static final String APROVADO = "APROVADO";
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(AlunoSituacaoController.class);
@@ -39,9 +41,9 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
     private boolean lgMatriculaAluno = false;
     private boolean lgAce = true;
     private boolean lgAluno = true;
-    private Aluno aluno = new Aluno();
+    private transient Aluno aluno = new Aluno();
     private EventoAce eventosAce;
-    private Curriculum curriculum;
+    private transient Curriculum curriculum;
     private ImportarArvore importador;
     private EstruturaArvore estruturaArvore;
     private float ira;
@@ -60,15 +62,15 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
     private int horasOpcionais;
     private int horasACE;
     private List<EventoAce> listaEventosAceSelecionadas;
-    private List<SituacaoDisciplina> listaDisciplinaEletivasSelecionadas;
-    private List<SituacaoDisciplina> listaDisciplinaOpcionaisSelecionadas;
-    private List<SituacaoDisciplina> listaDisciplinaObrigatoriasSelecionadas;
-    private List<Historico> listaHistorico;
+    private transient List<SituacaoDisciplina> listaDisciplinaEletivasSelecionadas;
+    private transient List<SituacaoDisciplina> listaDisciplinaOpcionaisSelecionadas;
+    private transient List<SituacaoDisciplina> listaDisciplinaObrigatoriasSelecionadas;
+    private transient List<Historico> listaHistorico;
     private List<EventoAce> listaEventosAce;
-    private List<SituacaoDisciplina> listaDisciplinaObrigatorias;
-    private List<SituacaoDisciplina> listaDisciplinaEletivas;
-    private List<SituacaoDisciplina> listaDisciplinaOpcionais;
-    private Curso curso = new Curso();
+    private transient List<SituacaoDisciplina> listaDisciplinaObrigatorias;
+    private transient List<SituacaoDisciplina> listaDisciplinaEletivas;
+    private transient List<SituacaoDisciplina> listaDisciplinaOpcionais;
+    private transient Curso curso = new Curso();
 
     @Inject
     private DisciplinaRepository disciplinas;
