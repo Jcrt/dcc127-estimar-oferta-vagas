@@ -36,6 +36,7 @@ Vai lá dá uma lida, sô!
 2. [👣 [Definições] Branches, commits e pull requests](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%91%A3-%5BDefini%C3%A7%C3%B5es%5D-Branches,-commits-e-pull-requests)
 3. [🤖 [Definições] GitHub Actions (CI \ CD)](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/wiki/%F0%9F%A4%96-%5BDefini%C3%A7%C3%B5es%5D-GitHub-Actions-(CI-%5C-CD))
 
+
 <sup> **Legenda**: </sup>
 <sup>🧪 Testes</sup>
 <sup>👣 Branches e fluxo de desenvolvimento</sup>
