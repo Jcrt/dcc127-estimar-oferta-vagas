@@ -215,22 +215,22 @@ public class AlunoSituacaoController
 
         aluno.calcularCet();
 
-        int SomaInt = 0;
+        int somaInt = 0;
         if (horasObrigatorias != 0) {
             percentualObrigatorias = (horasObrigatoriasConcluidas * 100 / horasObrigatorias);
         }
-        SomaInt = aluno.getGrade().getHorasEletivas();
+        somaInt = aluno.getGrade().getHorasEletivas();
         if (aluno.getGrade().getHorasEletivas() != 0) {
-            percentualEletivas = ((horasEletivasConcluidas * 100 / SomaInt));
+            percentualEletivas = (horasEletivasConcluidas * 100 / somaInt);
         }
-        SomaInt = aluno.getGrade().getHorasOpcionais();
+        somaInt = aluno.getGrade().getHorasOpcionais();
         if (aluno.getGrade().getHorasOpcionais() != 0) {
-            percentualOpcionais = ((horasOpcionaisConcluidas * 100 / SomaInt));
+            percentualOpcionais = (horasOpcionaisConcluidas * 100 / somaInt);
         }
 
         if (this.aluno.getSobraHorasOpcionais() > 0) {
-            List<EventoAce> ExcedentesOpcionais = CalculadorMateriasExcedentes.getExcedentesOpcionais(this.aluno.getGrade().getHorasOpcionais(), this.listaDisciplinaOpcionais);
-            for (EventoAce eventoAceExtra : ExcedentesOpcionais) {
+            List<EventoAce> excedentesOpcionais = CalculadorMateriasExcedentes.getExcedentesOpcionais(this.aluno.getGrade().getHorasOpcionais(), this.listaDisciplinaOpcionais);
+            for (EventoAce eventoAceExtra : excedentesOpcionais) {
                 listaEventosAce.add(eventoAceExtra);
                 for (SituacaoDisciplina d : listaDisciplinaOpcionais) {
                     if (d.getCodigo().equals(eventoAceExtra.getMatricula())) {
@@ -242,9 +242,9 @@ public class AlunoSituacaoController
             horasAceConcluidas += this.aluno.getSobraHorasOpcionais();
         }
 
-        SomaInt = aluno.getGrade().getHorasAce();
+        somaInt = aluno.getGrade().getHorasAce();
         if (aluno.getGrade().getHorasAce() != 0) {
-            percentualAce = (horasAceConcluidas * 100 / SomaInt);
+            percentualAce = (horasAceConcluidas * 100 / somaInt);
         }
         this.resetaDataTables();
     }
@@ -325,6 +325,7 @@ public class AlunoSituacaoController
                     disciplinaSituacao.setCargaHoraria(Integer.toString(c.getWorkload()));
                     disciplinaSituacao.setNome(disciplinas.buscarPorCodigoDisciplina(c.getId()).getNome());
                     String preRequisito = "";
+
                     for (Class cl : c.getPrerequisite()) {
                         preRequisito = cl.getId() + " : " + preRequisito;
                     }
@@ -382,8 +383,7 @@ public class AlunoSituacaoController
                         c.setWorkload(d.getCargaHoraria());
 
                     evento.setHoras((long) c.getWorkload());
-                    String periodo = s2[0];
-                    evento.setPeriodo(Integer.parseInt(periodo));
+                    evento.setPeriodo(Integer.parseInt(s2[0]));
                     evento.setExcluir(false);
                     listaEventosAce.add(evento);
                 } else {
