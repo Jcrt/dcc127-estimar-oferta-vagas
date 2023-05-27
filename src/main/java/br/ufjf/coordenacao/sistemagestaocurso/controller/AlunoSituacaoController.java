@@ -208,9 +208,9 @@ public class AlunoSituacaoController
         ira = aluno.getIra();
         aluno.calcularCet();
 
-        percentualObrigatorias = (int) CalculaPercentual(horasObrigatoriasConcluidas, horasObrigatorias);
-        percentualEletivas = (int) CalculaPercentual(horasEletivasConcluidas, aluno.getGrade().getHorasEletivas());
-        percentualOpcionais = (int) CalculaPercentual(horasOpcionaisConcluidas, aluno.getGrade().getHorasOpcionais());
+        percentualObrigatorias = (int) calculaPercentual(horasObrigatoriasConcluidas, horasObrigatorias);
+        percentualEletivas = (int) calculaPercentual(horasEletivasConcluidas, aluno.getGrade().getHorasEletivas());
+        percentualOpcionais = (int) calculaPercentual(horasOpcionaisConcluidas, aluno.getGrade().getHorasOpcionais());
 
         if (this.aluno.getSobraHorasOpcionais() > 0) {
             List<EventoAce> excedentesOpcionais = CalculadorMateriasExcedentes.getExcedentesOpcionais(this.aluno.getGrade().getHorasOpcionais(), this.listaDisciplinaOpcionais);
@@ -226,21 +226,23 @@ public class AlunoSituacaoController
             horasAceConcluidas += this.aluno.getSobraHorasOpcionais();
         }
 
-        percentualAce = (int) CalculaPercentual(horasAceConcluidas, aluno.getGrade().getHorasAce());
+        percentualAce = (int) calculaPercentual(horasAceConcluidas, aluno.getGrade().getHorasAce());
 
         this.resetaDataTables();
     }
 
-    public double CalculaPercentual(double numerador, double denominador) {
-        double resultado;
-
-        if (denominador > 0) {
-            resultado = (numerador * 100) / denominador;
-        } else {
-            resultado = 0;
-        }
-
-        return resultado;
+    /**
+     * Calcula o percentual, dado um numerador, que irá ser multiplicado por cem, e um denominador,
+     * que deve ser diferente de zero
+     *
+     * @param numerador   O numerador informado
+     * @param denominador O denominador informado
+     * @return O percentual calculado. Retorna 0 se o denominador for menor ou igual a zero.
+     */
+    public double calculaPercentual(double numerador, double denominador) {
+        return (denominador > 0)
+                ? (numerador * 100) / denominador
+                : 0;
     }
 
     public void limpaAluno() {
