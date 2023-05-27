@@ -130,14 +130,15 @@ class AlunoSituacaoControllerTest {
 
 	@ParameterizedTest
 	@CsvSource({
-			"0, 0, 0",
-			"2, 2, 2"
+			"0, 0, 0, 0, 0, 0, 0, 0",
+			"2, 2, 2, 2, 20, 100, 66, 20"
 	})
 	@DisplayName("GIVEN AlunoSituacaoController WHEN onItemSelectMatriculaAluno is called with no concluded hours by aluno THEN should return empty conclusion percents")
 	void onItemSelectMatriculaAlunoTest3(
-			int horasEletivasCompletadas,
-			int horasOpcionaisCompletadas,
-			int horasAceCompletadas
+			int horasEletivasCompletadas, int horasOpcionaisCompletadas,
+			int horasAceCompletadas, int horasObrigatoriasCompletadas,
+			double percentualHorasEletivasCompletadas, double percentualHorasOpcionaisCompletas,
+			double percentualHorasACECompletadas, double percentualHorasObrigatoriasCompletadas
 	) {
 		int horasEletivas = 10;
 		int horasOpcionais = 2;
@@ -174,15 +175,20 @@ class AlunoSituacaoControllerTest {
 
 		Mockito.when(estruturaArvoreMock.recuperarArvore(any(Grade.class), anyBoolean())).thenReturn(importaArvore);
 		Mockito.when(eventoAceRepositoryMock.buscarPorMatricula(anyString())).thenReturn(new ArrayList<>());
+		Mockito.when(eventoAceRepositoryMock.recuperarHorasConcluidasPorMatricula(alunoMock.getMatricula())).thenReturn(horasAceCompletadas);
 		Mockito.when(usuarioControllerMock.getAutenticacao()).thenReturn(autenticacao);
+		Mockito.when(alunoMock.getHorasAceConcluidas()).thenReturn(horasAceCompletadas);
+		Mockito.when(alunoMock.getHorasEletivasCompletadas()).thenReturn(horasEletivasCompletadas);
+		Mockito.when(alunoMock.getHorasOpcionaisCompletadas()).thenReturn(horasOpcionaisCompletadas);
+		Mockito.when(alunoMock.getHorasObrigatoriasCompletadas()).thenReturn(horasObrigatoriasCompletadas);
 
 		alunoSituacaoController.setEstruturaArvore(estruturaArvoreMock);
 		alunoSituacaoController.onItemSelectMatriculaAluno();
 
-		Assertions.assertEquals(0, alunoSituacaoController.getPercentualOpcionais());
-		Assertions.assertEquals(0, alunoSituacaoController.getPercentualAce());
-		Assertions.assertEquals(0, alunoSituacaoController.getPercentualEletivas());
-		Assertions.assertEquals(0, alunoSituacaoController.getPercentualObrigatorias());
+		Assertions.assertEquals(percentualHorasOpcionaisCompletas, alunoSituacaoController.getPercentualOpcionais());
+		Assertions.assertEquals(percentualHorasACECompletadas, alunoSituacaoController.getPercentualAce());
+		Assertions.assertEquals(percentualHorasEletivasCompletadas, alunoSituacaoController.getPercentualEletivas());
+		Assertions.assertEquals(percentualHorasObrigatoriasCompletadas, alunoSituacaoController.getPercentualObrigatorias());
 	}
 
 	/*****
