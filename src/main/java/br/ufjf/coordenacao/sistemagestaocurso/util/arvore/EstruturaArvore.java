@@ -1,10 +1,12 @@
 package br.ufjf.coordenacao.sistemagestaocurso.util.arvore;
 
+import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Historico;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import br.ufjf.coordenacao.sistemagestaocurso.model.*;
 
 
 public class EstruturaArvore implements Serializable{
@@ -34,23 +36,15 @@ public class EstruturaArvore implements Serializable{
 		return null;
 	}
 
-	public ImportarArvore recuperarArvore (Grade grade,boolean consideraCo){	
-
-
-
-
-
-
-		for(ImportarArvore importarArvore:todasArvores){
-			if(importarArvore.getGrade().getId() == grade.getId()){
-				importarArvore.importarDisciplinas(grade,consideraCo);
+	public ImportarArvore recuperarArvore(Grade grade, boolean consideraCo) {
+		for (ImportarArvore importarArvore : todasArvores) {
+			if (importarArvore.getGrade().getId() == grade.getId()) {
+				importarArvore.importarDisciplinas(grade, consideraCo);
 				return importarArvore;
 			}
-		}	
+		}
 
-
-
-		ImportarArvore importador = new ImportarArvore(); 
+		ImportarArvore importador = new ImportarArvore();
 		importador.setGrade(grade);
 
 		/*if (reseta == true){

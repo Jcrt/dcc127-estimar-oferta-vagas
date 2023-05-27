@@ -373,8 +373,7 @@ public class SimulacaoGradeController implements Serializable, IHorasCurriculare
 						c.setWorkload(d.getCargaHoraria());
 					
 					evento.setHoras((long) c.getWorkload());
-					String periodo = s2[0];
-					evento.setPeriodo(Integer.parseInt(periodo));
+					evento.setPeriodo(Integer.parseInt(s2[0]));
 					evento.setExcluir(false);
 					listaEventosAce.add(evento);
 				}

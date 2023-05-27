@@ -25,12 +25,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.Serializable;
 import java.text.Normalizer;
 import java.util.*;
 
 @Named
 @ViewScoped
-public class AlunoSituacaoController implements IHorasCurricularesConsumer {
+public class AlunoSituacaoController
+        implements IHorasCurricularesConsumer, Serializable {
     private static final String APROVADO = "APROVADO";
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(AlunoSituacaoController.class);
@@ -39,9 +41,9 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
     private boolean lgMatriculaAluno = false;
     private boolean lgAce = true;
     private boolean lgAluno = true;
-    private Aluno aluno = new Aluno();
+    private transient Aluno aluno = new Aluno();
     private EventoAce eventosAce;
-    private Curriculum curriculum;
+    private transient Curriculum curriculum;
     private ImportarArvore importador;
     private EstruturaArvore estruturaArvore;
     private float ira;
@@ -60,15 +62,15 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
     private int horasOpcionais;
     private int horasACE;
     private List<EventoAce> listaEventosAceSelecionadas;
-    private List<SituacaoDisciplina> listaDisciplinaEletivasSelecionadas;
-    private List<SituacaoDisciplina> listaDisciplinaOpcionaisSelecionadas;
-    private List<SituacaoDisciplina> listaDisciplinaObrigatoriasSelecionadas;
-    private List<Historico> listaHistorico;
+    private transient List<SituacaoDisciplina> listaDisciplinaEletivasSelecionadas;
+    private transient List<SituacaoDisciplina> listaDisciplinaOpcionaisSelecionadas;
+    private transient List<SituacaoDisciplina> listaDisciplinaObrigatoriasSelecionadas;
+    private transient List<Historico> listaHistorico;
     private List<EventoAce> listaEventosAce;
-    private List<SituacaoDisciplina> listaDisciplinaObrigatorias;
-    private List<SituacaoDisciplina> listaDisciplinaEletivas;
-    private List<SituacaoDisciplina> listaDisciplinaOpcionais;
-    private Curso curso = new Curso();
+    private transient List<SituacaoDisciplina> listaDisciplinaObrigatorias;
+    private transient List<SituacaoDisciplina> listaDisciplinaEletivas;
+    private transient List<SituacaoDisciplina> listaDisciplinaOpcionais;
+    private transient Curso curso = new Curso();
 
     @Inject
     private DisciplinaRepository disciplinas;
@@ -165,7 +167,6 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
     }
 
     public void onItemSelectMatriculaAluno() {
-
         lgAce = false;
         lgNomeAluno = true;
         lgMatriculaAluno = true;
@@ -191,11 +192,7 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
         }
 
         listaEventosAce = new ArrayList<>(eventosAceRepository.buscarPorMatricula(aluno.getMatricula()));
-        if (listaEventosAce != null) {
-            horasAceConcluidas = eventosAceRepository.recuperarHorasConcluidasPorMatricula(aluno.getMatricula());
-        } else {
-            listaEventosAce = new ArrayList<>();
-        }
+        horasAceConcluidas = eventosAceRepository.recuperarHorasConcluidasPorMatricula(aluno.getMatricula());
 
         gerarDadosAluno(st, curriculum);
 
@@ -208,27 +205,16 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
         }
 
         periodo = aluno.getPeriodoCorrente(usuarioController.getAutenticacao().getSemestreSelecionado());
-
         ira = aluno.getIra();
-
         aluno.calcularCet();
 
-        int SomaInt = 0;
-        if (horasObrigatorias != 0) {
-            percentualObrigatorias = (horasObrigatoriasConcluidas * 100 / horasObrigatorias);
-        }
-        SomaInt = aluno.getGrade().getHorasEletivas();
-        if (aluno.getGrade().getHorasEletivas() != 0) {
-            percentualEletivas = ((horasEletivasConcluidas * 100 / SomaInt));
-        }
-        SomaInt = aluno.getGrade().getHorasOpcionais();
-        if (aluno.getGrade().getHorasOpcionais() != 0) {
-            percentualOpcionais = ((horasOpcionaisConcluidas * 100 / SomaInt));
-        }
+        percentualObrigatorias = (int) CalculaPercentual(horasObrigatoriasConcluidas, horasObrigatorias);
+        percentualEletivas = (int) CalculaPercentual(horasEletivasConcluidas, aluno.getGrade().getHorasEletivas());
+        percentualOpcionais = (int) CalculaPercentual(horasOpcionaisConcluidas, aluno.getGrade().getHorasOpcionais());
 
         if (this.aluno.getSobraHorasOpcionais() > 0) {
-            List<EventoAce> ExcedentesOpcionais = CalculadorMateriasExcedentes.getExcedentesOpcionais(this.aluno.getGrade().getHorasOpcionais(), this.listaDisciplinaOpcionais);
-            for (EventoAce eventoAceExtra : ExcedentesOpcionais) {
+            List<EventoAce> excedentesOpcionais = CalculadorMateriasExcedentes.getExcedentesOpcionais(this.aluno.getGrade().getHorasOpcionais(), this.listaDisciplinaOpcionais);
+            for (EventoAce eventoAceExtra : excedentesOpcionais) {
                 listaEventosAce.add(eventoAceExtra);
                 for (SituacaoDisciplina d : listaDisciplinaOpcionais) {
                     if (d.getCodigo().equals(eventoAceExtra.getMatricula())) {
@@ -240,11 +226,21 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
             horasAceConcluidas += this.aluno.getSobraHorasOpcionais();
         }
 
-        SomaInt = aluno.getGrade().getHorasAce();
-        if (aluno.getGrade().getHorasAce() != 0) {
-            percentualAce = (horasAceConcluidas * 100 / SomaInt);
-        }
+        percentualAce = (int) CalculaPercentual(horasAceConcluidas, aluno.getGrade().getHorasAce());
+
         this.resetaDataTables();
+    }
+
+    public double CalculaPercentual(double numerador, double denominador) {
+        double resultado;
+
+        if (denominador > 0) {
+            resultado = (numerador * 100) / denominador;
+        } else {
+            resultado = 0;
+        }
+
+        return resultado;
     }
 
     public void limpaAluno() {
@@ -323,6 +319,7 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
                     disciplinaSituacao.setCargaHoraria(Integer.toString(c.getWorkload()));
                     disciplinaSituacao.setNome(disciplinas.buscarPorCodigoDisciplina(c.getId()).getNome());
                     String preRequisito = "";
+
                     for (Class cl : c.getPrerequisite()) {
                         preRequisito = cl.getId() + " : " + preRequisito;
                     }
@@ -380,8 +377,7 @@ public class AlunoSituacaoController implements IHorasCurricularesConsumer {
                         c.setWorkload(d.getCargaHoraria());
 
                     evento.setHoras((long) c.getWorkload());
-                    String periodo = s2[0];
-                    evento.setPeriodo(Integer.parseInt(periodo));
+                    evento.setPeriodo(Integer.parseInt(s2[0]));
                     evento.setExcluir(false);
                     listaEventosAce.add(evento);
                 } else {
