@@ -167,7 +167,6 @@ public class AlunoSituacaoController
     }
 
     public void onItemSelectMatriculaAluno() {
-
         lgAce = false;
         lgNomeAluno = true;
         lgMatriculaAluno = true;
@@ -193,11 +192,7 @@ public class AlunoSituacaoController
         }
 
         listaEventosAce = new ArrayList<>(eventosAceRepository.buscarPorMatricula(aluno.getMatricula()));
-        if (listaEventosAce != null) {
-            horasAceConcluidas = eventosAceRepository.recuperarHorasConcluidasPorMatricula(aluno.getMatricula());
-        } else {
-            listaEventosAce = new ArrayList<>();
-        }
+        horasAceConcluidas = eventosAceRepository.recuperarHorasConcluidasPorMatricula(aluno.getMatricula());
 
         gerarDadosAluno(st, curriculum);
 
@@ -210,23 +205,12 @@ public class AlunoSituacaoController
         }
 
         periodo = aluno.getPeriodoCorrente(usuarioController.getAutenticacao().getSemestreSelecionado());
-
         ira = aluno.getIra();
-
         aluno.calcularCet();
 
-        int somaInt = 0;
-        if (horasObrigatorias != 0) {
-            percentualObrigatorias = (horasObrigatoriasConcluidas * 100 / horasObrigatorias);
-        }
-        somaInt = aluno.getGrade().getHorasEletivas();
-        if (aluno.getGrade().getHorasEletivas() != 0) {
-            percentualEletivas = (horasEletivasConcluidas * 100 / somaInt);
-        }
-        somaInt = aluno.getGrade().getHorasOpcionais();
-        if (aluno.getGrade().getHorasOpcionais() != 0) {
-            percentualOpcionais = (horasOpcionaisConcluidas * 100 / somaInt);
-        }
+        percentualObrigatorias = (int) CalculaPercentual(horasObrigatoriasConcluidas, horasObrigatorias);
+        percentualEletivas = (int) CalculaPercentual(horasEletivasConcluidas, aluno.getGrade().getHorasEletivas());
+        percentualOpcionais = (int) CalculaPercentual(horasOpcionaisConcluidas, aluno.getGrade().getHorasOpcionais());
 
         if (this.aluno.getSobraHorasOpcionais() > 0) {
             List<EventoAce> excedentesOpcionais = CalculadorMateriasExcedentes.getExcedentesOpcionais(this.aluno.getGrade().getHorasOpcionais(), this.listaDisciplinaOpcionais);
@@ -242,11 +226,21 @@ public class AlunoSituacaoController
             horasAceConcluidas += this.aluno.getSobraHorasOpcionais();
         }
 
-        somaInt = aluno.getGrade().getHorasAce();
-        if (aluno.getGrade().getHorasAce() != 0) {
-            percentualAce = (horasAceConcluidas * 100 / somaInt);
-        }
+        percentualAce = (int) CalculaPercentual(horasAceConcluidas, aluno.getGrade().getHorasAce());
+
         this.resetaDataTables();
+    }
+
+    public double CalculaPercentual(double numerador, double denominador) {
+        double resultado;
+
+        if (denominador > 0) {
+            resultado = (numerador * 100) / denominador;
+        } else {
+            resultado = 0;
+        }
+
+        return resultado;
     }
 
     public void limpaAluno() {
