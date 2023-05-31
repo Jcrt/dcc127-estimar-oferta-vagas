@@ -1,15 +1,14 @@
 package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
 import br.ufjf.coordenacao.OfertaVagas.model.Class;
-import br.ufjf.coordenacao.OfertaVagas.model.Curriculum;
-import br.ufjf.coordenacao.OfertaVagas.model.Student;
-import br.ufjf.coordenacao.OfertaVagas.model.StudentsHistory;
+import br.ufjf.coordenacao.OfertaVagas.model.*;
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.Autenticacao;
+import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.SituacaoDisciplina;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.EventoAceRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
@@ -31,6 +30,7 @@ import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -41,9 +41,17 @@ class AlunoSituacaoControllerTest {
 	private static final String gridEletivasExpression = "form:gridEletivas";
 	private static final String gridOpcionaisExpression = "form:gridOpcionais";
 	private static final String gridAceExpression = "form:gridAce";
-	private static final String codigoDisciplinaCalculo = "MAT155🆘";
-	private static final String semestreSelecionado = "2023/1";
+	private static final String codigoDisciplinaCalculoI = "MAT154🆘";
+	private static final String codigoDisciplinaCalculoII = "MAT156🆘";
+	private static final String codigoDisciplinaGA = "MAT155🆘";
+	private static final String codigoDisciplinaEletiva1 = "ELE001";
+	private static final String codigoDisciplinaEletiva2 = "ELE002";
+	private static final String codigoDisciplinaOpcional1 = "OPT001";
+	private static final String codigoDisciplinaOpcional2 = "OPT002";
+	private static final String selectedSemester = "2023/1";
 	private static final String codigoEstudante = "201376082";
+	private static final String codigoCurso = "76";
+	private static final String codigoCurriculo = "2013-1";
 
 	@Mock
 	private FacesContext facesContextMock;
@@ -68,6 +76,27 @@ class AlunoSituacaoControllerTest {
 
 	@Mock
 	private DisciplinaRepository disciplinaRepositoryMock;
+
+	@Mock
+	private Student studentMock;
+
+	@Mock
+	private Curriculum curriculumMock;
+
+	@Mock
+	private Class mandatoryClassMock1;
+	@Mock
+	private Class mandatoryClassMock2;
+	@Mock
+	private Class mandatoryClassMock3;
+	@Mock
+	private Class electiveClassMock1;
+	@Mock
+	private Class electiveClassMock2;
+	@Mock
+	private Class optionalClassMock1;
+	@Mock
+	private Class optionalClassMock2;
 
 	@InjectMocks
 	private AlunoSituacaoController alunoSituacaoController;
@@ -110,10 +139,6 @@ class AlunoSituacaoControllerTest {
 		Mockito.when(viewRoot.findComponent(gridAceExpression)).thenReturn(dataTables.get(3));
 	}
 
-	/*****
-	 * resetaDataTable tests
-	 */
-
 	@Test
 	@DisplayName("GIVEN AlunoSituacaoController WHEN resetDataTable is called THEN resets all data tables")
 	void resetaDataTablesTest1() {
@@ -149,29 +174,22 @@ class AlunoSituacaoControllerTest {
 		initGradeTimesMock(horasEletivas, horasOpcionais, horasACE);
 		initDataTableFacesMock(getDataTablesForTest(false));
 
-		Class classeSI = new Class(codigoDisciplinaCalculo);
-		classeSI.setWorkload(horasObrigatorias);
-
-		TreeSet<Class> classTree = new TreeSet<>();
-		classTree.add(classeSI);
-
 		HashMap studentList = Mockito.mock(HashMap.class);
-		Mockito.when(studentList.get(anyString())).thenReturn(new Student(codigoEstudante));
+
+		Mockito.when(studentList.get(anyString())).thenReturn(studentMock);
 
 		StudentsHistory sh = Mockito.mock(StudentsHistory.class);
 		Mockito.when(sh.getStudents()).thenReturn(studentList);
 
-		HashMap<Integer, TreeSet<Class>> mandatories = new HashMap<>();
-		mandatories.put(1, classTree);
-		Curriculum curriculum = Mockito.mock(Curriculum.class);
-		Mockito.when(curriculum.getMandatories()).thenReturn(mandatories);
+		initCurriculumMock(horasObrigatorias, 0);
+		initOptionalClassMock(10);
 
 		ImportarArvore importaArvore = Mockito.mock(ImportarArvore.class);
 		Mockito.when(importaArvore.getSh()).thenReturn(sh);
-		Mockito.when(importaArvore.get_cur()).thenReturn(curriculum);
+		Mockito.when(importaArvore.get_cur()).thenReturn(curriculumMock);
 
 		Autenticacao autenticacao = Mockito.mock(Autenticacao.class);
-		Mockito.when(autenticacao.getSemestreSelecionado()).thenReturn(semestreSelecionado);
+		Mockito.when(autenticacao.getSemestreSelecionado()).thenReturn(selectedSemester);
 
 		Mockito.when(estruturaArvoreMock.recuperarArvore(any(Grade.class), anyBoolean())).thenReturn(importaArvore);
 		Mockito.when(eventoAceRepositoryMock.buscarPorMatricula(anyString())).thenReturn(new ArrayList<>());
@@ -191,9 +209,6 @@ class AlunoSituacaoControllerTest {
 		Assertions.assertEquals(percentualHorasObrigatoriasCompletadas, alunoSituacaoController.getPercentualObrigatorias());
 	}
 
-	/*****
-	 * onItemSelectMatriculaAluno tests
-	 */
 	@Test
 	@DisplayName("GIVEN AlunoSituacaoController WHEN onItemSelectMatriculaAluno is called with no grade information THEN all hours should be 0")
 	void onItemSelectMatriculaAlunoTest1() {
@@ -237,6 +252,85 @@ class AlunoSituacaoControllerTest {
 	    Assertions.assertEquals(horasObrigatoriasConcluidas, alunoSituacaoController.getHorasObrigatoriasConcluidas());
     }
 
+	@Test
+	@DisplayName("GIVEN AlunoSituacaoController WHEN gerarDadosAluno is called THEN all disciplines should be in the correct list")
+	void gerarDadosAlunoTest1() {
+		initBaseMocks();
+		initCurriculumMock(10, 5);
+		initOptionalClassMock(20);
+
+		alunoSituacaoController.gerarDadosAluno(studentMock, curriculumMock);
+
+		Assertions.assertTrue(isDisciplineInList(
+				alunoSituacaoController.getListaDisciplinaObrigatorias(),
+				codigoDisciplinaCalculoI,
+				AlunoSituacaoController.APROVADO
+		));
+		Assertions.assertTrue(isDisciplineInList(
+				alunoSituacaoController.getListaDisciplinaObrigatorias(),
+				codigoDisciplinaCalculoII,
+				AlunoSituacaoController.NAO_APROVADO
+		));
+		Assertions.assertTrue(isDisciplineInList(
+				alunoSituacaoController.getListaDisciplinaObrigatorias(),
+				codigoDisciplinaGA,
+				AlunoSituacaoController.APROVADO
+		));
+		Assertions.assertTrue(isDisciplineInList(
+				alunoSituacaoController.getListaDisciplinaOpcionais(),
+				codigoDisciplinaOpcional2,
+				AlunoSituacaoController.APROVADO
+		));
+		Assertions.assertTrue(isDisciplineInList(
+				alunoSituacaoController.getListaDisciplinaEletivas(),
+				codigoDisciplinaEletiva1,
+				AlunoSituacaoController.APROVADO
+		));
+		Assertions.assertEquals(30, alunoSituacaoController.getHorasObrigatorias());
+		Assertions.assertEquals(20, alunoSituacaoController.getHorasAceConcluidas());
+	}
+
+	private boolean isDisciplineInList(List<SituacaoDisciplina> list, String subjectId, String situation) {
+		return list.stream().anyMatch(
+				x -> x.getCodigo().equals(subjectId)
+						&& x.getSituacao().equals(situation));
+	}
+
+	void initMandatoryClassesMock(int mandatoryHours) {
+		Mockito.when(mandatoryClassMock1.getId()).thenReturn(codigoDisciplinaCalculoI);
+		Mockito.when(mandatoryClassMock1.getWorkload()).thenReturn(mandatoryHours);
+
+		Mockito.when(mandatoryClassMock2.getId()).thenReturn(codigoDisciplinaCalculoII);
+		Mockito.when(mandatoryClassMock2.getWorkload()).thenReturn(mandatoryHours);
+
+		Mockito.when(mandatoryClassMock3.getId()).thenReturn(codigoDisciplinaGA);
+		Mockito.when(mandatoryClassMock3.getWorkload()).thenReturn(mandatoryHours);
+
+		ArrayList<Class> prerequisites = new ArrayList<>();
+		prerequisites.add(mandatoryClassMock1);
+		Mockito.when(mandatoryClassMock2.getPrerequisite()).thenReturn(new ArrayList<>(prerequisites));
+
+		ArrayList<Class> corequisite = new ArrayList<>();
+		corequisite.add(mandatoryClassMock3);
+		Mockito.when(mandatoryClassMock2.getCorequisite()).thenReturn(new ArrayList<>(corequisite));
+	}
+
+	void initElectiveClassMock(int electiveHours) {
+		Mockito.when(electiveClassMock1.getId()).thenReturn(codigoDisciplinaEletiva1);
+		Mockito.when(electiveClassMock1.getWorkload()).thenReturn(electiveHours);
+
+		Mockito.when(electiveClassMock2.getId()).thenReturn(codigoDisciplinaEletiva2);
+		Mockito.when(electiveClassMock2.getWorkload()).thenReturn(electiveHours);
+	}
+
+	void initOptionalClassMock(int optionalHours) {
+		Mockito.when(optionalClassMock1.getId()).thenReturn(codigoDisciplinaOpcional1);
+		Mockito.when(optionalClassMock1.getWorkload()).thenReturn(optionalHours);
+
+		Mockito.when(optionalClassMock2.getId()).thenReturn(codigoDisciplinaOpcional2);
+		Mockito.when(optionalClassMock2.getWorkload()).thenReturn(optionalHours);
+	}
+
 	private void initGradeTimesMock(int horasEletivas, int horasOpcionais, int horasACE) {
 		Mockito.when(gradeMock.getHorasEletivas()).thenReturn(horasEletivas);
 		Mockito.when(gradeMock.getHorasOpcionais()).thenReturn(horasOpcionais);
@@ -247,22 +341,84 @@ class AlunoSituacaoControllerTest {
 	 * Method that initializes the main mocks
 	 */
 	private void initBaseMocks() {
+
+		InitDisciplinaStubAndMock(codigoDisciplinaCalculoI, "Calculo I 👿", 40);
+		InitDisciplinaStubAndMock(codigoDisciplinaCalculoII, "Calculo II 👿", 40);
+		InitDisciplinaStubAndMock(codigoDisciplinaGA, "Geometria Analítica 👿", 40);
+		InitDisciplinaStubAndMock(codigoDisciplinaEletiva1, "Disciplina Eletiva 1 👿", 20);
+		InitDisciplinaStubAndMock(codigoDisciplinaEletiva2, "Disciplina Eletiva 2 👿", 40);
+		InitDisciplinaStubAndMock(codigoDisciplinaOpcional1, "Disciplina Opcional 1 👿", 20);
+		InitDisciplinaStubAndMock(codigoDisciplinaOpcional2, "Disciplina Opcional 2 👿", 40);
+
+		InitStudentMock();
+
 		ArrayList<Aluno> alunoListStub = new ArrayList<>();
 		alunoListStub.add(alunoMock);
 
-		Disciplina disciplinaStub = new Disciplina();
-		disciplinaStub.setCodigo(codigoDisciplinaCalculo);
-		disciplinaStub.setNome("Calculo I 👿");
-
 		Mockito.when(cursoMock.getGrupoAlunos()).thenReturn(alunoListStub);
+		Mockito.when(cursoMock.getCodigo()).thenReturn(codigoCurso);
+
 		Mockito.when(gradeMock.getCurso()).thenReturn(cursoMock);
 		Mockito.when(gradeMock.getId()).thenReturn(1L);
 		Mockito.when(gradeMock.getCodigo()).thenReturn("Codigo");
+
 		Mockito.when(alunoMock.getGrade()).thenReturn(gradeMock);
-		Mockito.when(alunoMock.getMatricula()).thenReturn(semestreSelecionado);
-		Mockito.when(disciplinaRepositoryMock.buscarPorCodigoDisciplina(codigoDisciplinaCalculo)).thenReturn(disciplinaStub);
+		Mockito.when(alunoMock.getMatricula()).thenReturn(selectedSemester);
 
 		alunoSituacaoController.setCurso(cursoMock);
 		alunoSituacaoController.setAluno(alunoMock);
-    }
+	}
+
+	public void initCurriculumMock(int mandatoryHours, int electiveHours) {
+		Mockito.when(curriculumMock.getCurriculumId()).thenReturn(codigoCurriculo);
+
+		HashMap<Integer, TreeSet<Class>> mandatories = new HashMap<>();
+		TreeSet<Class> mandatoryClasses = new TreeSet<>();
+		mandatoryClasses.add(mandatoryClassMock1);
+		mandatoryClasses.add(mandatoryClassMock2);
+		mandatoryClasses.add(mandatoryClassMock3);
+		mandatories.put(1, mandatoryClasses);
+		initMandatoryClassesMock(mandatoryHours);
+		Mockito.when(curriculumMock.getMandatories()).thenReturn(mandatories);
+
+		TreeSet<Class> electiveClasses = new TreeSet<>();
+		electiveClasses.add(electiveClassMock1);
+		electiveClasses.add(electiveClassMock2);
+		initElectiveClassMock(electiveHours);
+		Mockito.when(curriculumMock.getElectives()).thenReturn(electiveClasses);
+	}
+
+	public void InitStudentMock() {
+		Mockito.when(studentMock.getId()).thenReturn(codigoEstudante);
+		Mockito.when(studentMock.getCourse()).thenReturn(codigoCurso);
+		Mockito.when(studentMock.getCurriculum()).thenReturn(codigoCurriculo);
+
+		HashMap<Class, ArrayList<String[]>> approvedClasses = new HashMap<>();
+		approvedClasses.put(mandatoryClassMock1, new ArrayList<>());
+		approvedClasses.put(mandatoryClassMock3, new ArrayList<>());
+		approvedClasses.put(electiveClassMock1, new ArrayList<>());
+
+		ArrayList<String[]> optionalClassData1 = new ArrayList<>();
+		optionalClassData1.add("1,APR,A".split(","));
+		approvedClasses.put(optionalClassMock1, optionalClassData1);
+
+		ArrayList<String[]> optionalClassData2 = new ArrayList<>();
+		optionalClassData2.add("1,HATE,UNIT,TESTS".split(","));
+		approvedClasses.put(optionalClassMock2, optionalClassData2);
+
+		HashMap<Class, ArrayList<String[]>> reprovedClasses = new HashMap<>();
+		reprovedClasses.put(mandatoryClassMock2, new ArrayList<>());
+		reprovedClasses.put(electiveClassMock2, new ArrayList<>());
+
+		Mockito.when(studentMock.getClasses(ClassStatus.APPROVED)).thenReturn(approvedClasses);
+		Mockito.when(studentMock.getClasses(ClassStatus.REPROVED_GRADE)).thenReturn(reprovedClasses);
+	}
+
+	public void InitDisciplinaStubAndMock(String codigoDisciplina, String nomeDisciplina, int cargaHoraria) {
+		Disciplina disciplina1Stub = new Disciplina();
+		disciplina1Stub.setCodigo(codigoDisciplina);
+		disciplina1Stub.setNome(nomeDisciplina);
+		disciplina1Stub.setCargaHoraria(cargaHoraria);
+		Mockito.when(disciplinaRepositoryMock.buscarPorCodigoDisciplina(codigoDisciplina)).thenReturn(disciplina1Stub);
+	}
 }

@@ -33,7 +33,8 @@ import java.util.*;
 @ViewScoped
 public class AlunoSituacaoController
         implements IHorasCurricularesConsumer, Serializable {
-    private static final String APROVADO = "APROVADO";
+    public static final String APROVADO = "APROVADO";
+    public static final String NAO_APROVADO = "NAO APROVADO";
     private static final long serialVersionUID = 1L;
     private static final Logger logger = Logger.getLogger(AlunoSituacaoController.class);
 
@@ -314,8 +315,9 @@ public class AlunoSituacaoController
                         lgPeriodoAtual = true;
                     }
                     naocompletado.add(c.getId());
+
                     SituacaoDisciplina disciplinaSituacao = new SituacaoDisciplina();
-                    disciplinaSituacao.setSituacao("NAO APROVADO");
+                    disciplinaSituacao.setSituacao(NAO_APROVADO);
                     disciplinaSituacao.setCodigo(c.getId());
                     disciplinaSituacao.setPeriodo(Integer.toString(i));
                     disciplinaSituacao.setCargaHoraria(Integer.toString(c.getWorkload()));
@@ -328,9 +330,11 @@ public class AlunoSituacaoController
                     for (Class cl : c.getCorequisite()) {
                         preRequisito = cl.getId() + " : " + preRequisito;
                     }
+
                     disciplinaSituacao.setListaPreRequisitos(preRequisito);
                     listaDisciplinaObrigatorias.add(disciplinaSituacao);
                 } else {
+
                     SituacaoDisciplina disciplinaSituacao = new SituacaoDisciplina();
                     disciplinaSituacao.setCodigo(c.getId());
                     disciplinaSituacao.setSituacao(APROVADO);
@@ -338,6 +342,7 @@ public class AlunoSituacaoController
                     disciplinaSituacao.setCargaHoraria(Integer.toString(c.getWorkload()));
                     disciplinaSituacao.setNome(disciplinas.buscarPorCodigoDisciplina(c.getId()).getNome());
                     String preRequisito = "";
+
                     for (Class cl : c.getPrerequisite()) {
                         if (!preRequisito.contains(cl.getId())) {
                             preRequisito = cl.getId() + " : " + preRequisito;
@@ -384,11 +389,13 @@ public class AlunoSituacaoController
                     listaEventosAce.add(evento);
                 } else {
                     Disciplina opcional = disciplinas.buscarPorCodigoDisciplina(c.getId());
+
                     SituacaoDisciplina disciplinaSituacao = new SituacaoDisciplina();
                     disciplinaSituacao.setCodigo(c.getId());
                     disciplinaSituacao.setSituacao(APROVADO);
                     disciplinaSituacao.setCargaHoraria(opcional.getCargaHoraria().toString());
                     disciplinaSituacao.setNome(opcional.getNome());
+
                     listaDisciplinaOpcionais.add(disciplinaSituacao);
                 }
             }
