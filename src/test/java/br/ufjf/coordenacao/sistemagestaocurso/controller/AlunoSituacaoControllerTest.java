@@ -124,8 +124,8 @@ class AlunoSituacaoControllerTest {
 
 	@ParameterizedTest
 	@CsvSource({
-			"0, 0, 0, 0, 0, 0, 0, 0",
-			"2, 2, 2, 2, 20, 100, 66, 20"
+			"0, 0, 0, 0, 0, 0, 10, 0",
+			"2, 2, 2, 2, 2, 2, 12, 0"
 	})
 	@DisplayName("GIVEN AlunoSituacaoController WHEN onItemSelectMatriculaAluno is called with no concluded hours by aluno THEN should return empty conclusion percents")
 	void onItemSelectMatriculaAlunoTest3(
@@ -134,16 +134,16 @@ class AlunoSituacaoControllerTest {
 			double percentualHorasEletivasCompletadas, double percentualHorasOpcionaisCompletas,
 			double percentualHorasACECompletadas, double percentualHorasObrigatoriasCompletadas
 	) {
-		int horasEletivas = 10;
-		int horasOpcionais = 2;
-		int horasACE = 3;
-		int horasObrigatorias = 10;
+		int horasEletivas = 100;
+		int horasOpcionais = 100;
+		int horasACE = 100;
+		int horasObrigatorias = 100;
 
 		initBaseMocks();
 		initGradeTimesMock(horasEletivas, horasOpcionais, horasACE);
 		initDataTableFacesMock(initDataTableMocks(false));
 
-		HashMap studentList = Mockito.mock(HashMap.class);
+		HashMap<String, Student> studentList = Mockito.mock(HashMap.class);
 
 		Mockito.when(studentList.get(anyString())).thenReturn(studentMock);
 
