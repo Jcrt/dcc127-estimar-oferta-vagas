@@ -8,7 +8,6 @@ import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
 import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.Autenticacao;
-import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.SituacaoDisciplina;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.EventoAceRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
@@ -32,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.function.Predicate;
 
 import static org.mockito.ArgumentMatchers.*;
 
@@ -52,6 +52,7 @@ class AlunoSituacaoControllerTest {
 	private static final String codigoEstudante = "201376082";
 	private static final String codigoCurso = "76";
 	private static final String codigoCurriculo = "2013-1";
+	private static final String descricaoDisciplinaOpcional1 = "Disciplina Opcional 1 👿";
 
 	@Mock
 	private FacesContext facesContextMock;
@@ -107,42 +108,10 @@ class AlunoSituacaoControllerTest {
 		alunoSituacaoController.init();
 	}
 
-	/**
-	 * Constrói um {@link ArrayList<DataTable>} contendo as {@link DataTable} necessárias para teste
-	 *
-	 * @param shouldMarkAsInitialState True se for necessário marcar a {@link DataTable} como estado inicial
-	 * @return Um {@link ArrayList<DataTable>} contendo as {@link DataTable} necessárias para teste
-	 */
-	ArrayList<DataTable> getDataTablesForTest(boolean shouldMarkAsInitialState) {
-		ArrayList<DataTable> dataTables = new ArrayList<>();
-
-		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
-		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
-		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
-		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
-
-		return dataTables;
-	}
-
-	/**
-	 * Constrói os mocks para testes que usam as {@link DataTable} do PrimeFace
-	 *
-	 * @param dataTables As {@link DataTable} passadas para gerar os mocks
-	 */
-	void initDataTableFacesMock(ArrayList<DataTable> dataTables) {
-		UIViewRoot viewRoot = Mockito.mock(UIViewRoot.class);
-
-		Mockito.when(facesContextMock.getViewRoot()).thenReturn(viewRoot);
-		Mockito.when(viewRoot.findComponent(gridObrigatoriasExpression)).thenReturn(dataTables.get(0));
-		Mockito.when(viewRoot.findComponent(gridEletivasExpression)).thenReturn(dataTables.get(1));
-		Mockito.when(viewRoot.findComponent(gridOpcionaisExpression)).thenReturn(dataTables.get(2));
-		Mockito.when(viewRoot.findComponent(gridAceExpression)).thenReturn(dataTables.get(3));
-	}
-
 	@Test
 	@DisplayName("GIVEN AlunoSituacaoController WHEN resetDataTable is called THEN resets all data tables")
 	void resetaDataTablesTest1() {
-		ArrayList<DataTable> dataTables = getDataTablesForTest(true);
+		ArrayList<DataTable> dataTables = initDataTableMocks(true);
 		initDataTableFacesMock(dataTables);
 
 		alunoSituacaoController.resetaDataTables();
@@ -172,7 +141,7 @@ class AlunoSituacaoControllerTest {
 
 		initBaseMocks();
 		initGradeTimesMock(horasEletivas, horasOpcionais, horasACE);
-		initDataTableFacesMock(getDataTablesForTest(false));
+		initDataTableFacesMock(initDataTableMocks(false));
 
 		HashMap studentList = Mockito.mock(HashMap.class);
 
@@ -261,41 +230,89 @@ class AlunoSituacaoControllerTest {
 
 		alunoSituacaoController.gerarDadosAluno(studentMock, curriculumMock);
 
-		Assertions.assertTrue(isDisciplineInList(
+		Assertions.assertTrue(checkIfPredicateIsTrue(
 				alunoSituacaoController.getListaDisciplinaObrigatorias(),
-				codigoDisciplinaCalculoI,
-				AlunoSituacaoController.APROVADO
+				x -> x.getSituacao().equals(AlunoSituacaoController.APROVADO)
+						&& x.getCodigo().equals(codigoDisciplinaCalculoI)
 		));
-		Assertions.assertTrue(isDisciplineInList(
+		Assertions.assertTrue(checkIfPredicateIsTrue(
 				alunoSituacaoController.getListaDisciplinaObrigatorias(),
-				codigoDisciplinaCalculoII,
-				AlunoSituacaoController.NAO_APROVADO
+				x -> x.getSituacao().equals(AlunoSituacaoController.NAO_APROVADO)
+						&& x.getCodigo().equals(codigoDisciplinaCalculoII)
+						&& x.getListaPreRequisitos().equals(codigoDisciplinaGA + " : " + codigoDisciplinaCalculoI + " : ")
 		));
-		Assertions.assertTrue(isDisciplineInList(
+		Assertions.assertTrue(checkIfPredicateIsTrue(
 				alunoSituacaoController.getListaDisciplinaObrigatorias(),
-				codigoDisciplinaGA,
-				AlunoSituacaoController.APROVADO
+				x -> x.getSituacao().equals(AlunoSituacaoController.APROVADO)
+						&& x.getCodigo().equals(codigoDisciplinaGA)
 		));
-		Assertions.assertTrue(isDisciplineInList(
+		Assertions.assertTrue(checkIfPredicateIsTrue(
 				alunoSituacaoController.getListaDisciplinaOpcionais(),
-				codigoDisciplinaOpcional2,
-				AlunoSituacaoController.APROVADO
+				x -> x.getSituacao().equals(AlunoSituacaoController.APROVADO)
+						&& x.getCodigo().equals(codigoDisciplinaOpcional2)
 		));
-		Assertions.assertTrue(isDisciplineInList(
+		Assertions.assertTrue(checkIfPredicateIsTrue(
 				alunoSituacaoController.getListaDisciplinaEletivas(),
-				codigoDisciplinaEletiva1,
-				AlunoSituacaoController.APROVADO
+				x -> x.getSituacao().equals(AlunoSituacaoController.APROVADO)
+						&& x.getCodigo().equals(codigoDisciplinaEletiva1)
+		));
+		Assertions.assertTrue(checkIfPredicateIsTrue(
+				alunoSituacaoController.getListaEventosAce(),
+				x -> x.getDescricao().equals(descricaoDisciplinaOpcional1)
 		));
 		Assertions.assertEquals(30, alunoSituacaoController.getHorasObrigatorias());
 		Assertions.assertEquals(20, alunoSituacaoController.getHorasAceConcluidas());
 	}
 
-	private boolean isDisciplineInList(List<SituacaoDisciplina> list, String subjectId, String situation) {
-		return list.stream().anyMatch(
-				x -> x.getCodigo().equals(subjectId)
-						&& x.getSituacao().equals(situation));
+	/**
+	 * Dada uma lista de objetos, verifica se o predicado passado retorna verdadeiro
+	 *
+	 * @param list        A lista data
+	 * @param predicate   O predicado para ser testado
+	 * @param <TListType> O tipo de lista que será manipulada
+	 * @return Verdadeiro se existe algum ítem dentro da lista com o predicado dado, senão falso
+	 */
+	<TListType> boolean checkIfPredicateIsTrue(List<TListType> list, Predicate<TListType> predicate) {
+		return list.stream().anyMatch(predicate);
 	}
 
+	/**
+	 * Constrói um {@link ArrayList<DataTable>} contendo as {@link DataTable} necessárias para teste
+	 *
+	 * @param shouldMarkAsInitialState True se for necessário marcar a {@link DataTable} como estado inicial
+	 * @return Um {@link ArrayList<DataTable>} contendo as {@link DataTable} necessárias para teste
+	 */
+	ArrayList<DataTable> initDataTableMocks(boolean shouldMarkAsInitialState) {
+		ArrayList<DataTable> dataTables = new ArrayList<>();
+
+		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
+		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
+		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
+		dataTables.add(DataTableHelper.createDataTableForTest(shouldMarkAsInitialState));
+
+		return dataTables;
+	}
+
+	/**
+	 * Constrói os mocks para testes que usam as {@link DataTable} do PrimeFace
+	 *
+	 * @param dataTables As {@link DataTable} passadas para gerar os mocks
+	 */
+	void initDataTableFacesMock(ArrayList<DataTable> dataTables) {
+		UIViewRoot viewRoot = Mockito.mock(UIViewRoot.class);
+
+		Mockito.when(facesContextMock.getViewRoot()).thenReturn(viewRoot);
+		Mockito.when(viewRoot.findComponent(gridObrigatoriasExpression)).thenReturn(dataTables.get(0));
+		Mockito.when(viewRoot.findComponent(gridEletivasExpression)).thenReturn(dataTables.get(1));
+		Mockito.when(viewRoot.findComponent(gridOpcionaisExpression)).thenReturn(dataTables.get(2));
+		Mockito.when(viewRoot.findComponent(gridAceExpression)).thenReturn(dataTables.get(3));
+	}
+
+	/**
+	 * Constrói os mocks para as {@link Class} obrigatórias
+	 *
+	 * @param mandatoryHours Numero de horas obrigatórias que serão atribuidas para cada uma das classes
+	 */
 	void initMandatoryClassesMock(int mandatoryHours) {
 		Mockito.when(mandatoryClassMock1.getId()).thenReturn(codigoDisciplinaCalculoI);
 		Mockito.when(mandatoryClassMock1.getWorkload()).thenReturn(mandatoryHours);
@@ -315,6 +332,11 @@ class AlunoSituacaoControllerTest {
 		Mockito.when(mandatoryClassMock2.getCorequisite()).thenReturn(new ArrayList<>(corequisite));
 	}
 
+	/**
+	 * Constrói os mocks para as {@link Class} eletivas
+	 *
+	 * @param electiveHours Numero de horas eletivas que serão atribuidas para cada uma das classes
+	 */
 	void initElectiveClassMock(int electiveHours) {
 		Mockito.when(electiveClassMock1.getId()).thenReturn(codigoDisciplinaEletiva1);
 		Mockito.when(electiveClassMock1.getWorkload()).thenReturn(electiveHours);
@@ -323,6 +345,11 @@ class AlunoSituacaoControllerTest {
 		Mockito.when(electiveClassMock2.getWorkload()).thenReturn(electiveHours);
 	}
 
+	/**
+	 * Constrói os mocks para as {@link Class} opcionais
+	 *
+	 * @param optionalHours Numero de horas opcionais que serão atribuidas para cada uma das classes
+	 */
 	void initOptionalClassMock(int optionalHours) {
 		Mockito.when(optionalClassMock1.getId()).thenReturn(codigoDisciplinaOpcional1);
 		Mockito.when(optionalClassMock1.getWorkload()).thenReturn(optionalHours);
@@ -331,6 +358,13 @@ class AlunoSituacaoControllerTest {
 		Mockito.when(optionalClassMock2.getWorkload()).thenReturn(optionalHours);
 	}
 
+	/**
+	 * Define quantidade de horas para cada uma das modalidades de ensino para a classe {@link Grade}
+	 *
+	 * @param horasEletivas  Numero de horas eletivas que serão atribuidas para cada uma das classes
+	 * @param horasOpcionais Numero de horas opcionais que serão atribuidas para cada uma das classes
+	 * @param horasACE       Numero de horas ACE que serão atribuidas para cada uma das classes
+	 */
 	private void initGradeTimesMock(int horasEletivas, int horasOpcionais, int horasACE) {
 		Mockito.when(gradeMock.getHorasEletivas()).thenReturn(horasEletivas);
 		Mockito.when(gradeMock.getHorasOpcionais()).thenReturn(horasOpcionais);
@@ -347,7 +381,7 @@ class AlunoSituacaoControllerTest {
 		InitDisciplinaStubAndMock(codigoDisciplinaGA, "Geometria Analítica 👿", 40);
 		InitDisciplinaStubAndMock(codigoDisciplinaEletiva1, "Disciplina Eletiva 1 👿", 20);
 		InitDisciplinaStubAndMock(codigoDisciplinaEletiva2, "Disciplina Eletiva 2 👿", 40);
-		InitDisciplinaStubAndMock(codigoDisciplinaOpcional1, "Disciplina Opcional 1 👿", 20);
+		InitDisciplinaStubAndMock(codigoDisciplinaOpcional1, descricaoDisciplinaOpcional1, 20);
 		InitDisciplinaStubAndMock(codigoDisciplinaOpcional2, "Disciplina Opcional 2 👿", 40);
 
 		InitStudentMock();
@@ -369,6 +403,12 @@ class AlunoSituacaoControllerTest {
 		alunoSituacaoController.setAluno(alunoMock);
 	}
 
+	/**
+	 * Method that initializes the mocks for the {@link Curriculum}
+	 *
+	 * @param mandatoryHours Number of mandatory hours that will be assigned to each of the classes
+	 * @param electiveHours  Number of elective hours that will be assigned to each of the classes
+	 */
 	public void initCurriculumMock(int mandatoryHours, int electiveHours) {
 		Mockito.when(curriculumMock.getCurriculumId()).thenReturn(codigoCurriculo);
 
@@ -388,6 +428,9 @@ class AlunoSituacaoControllerTest {
 		Mockito.when(curriculumMock.getElectives()).thenReturn(electiveClasses);
 	}
 
+	/**
+	 * Method that initializes the mocks for the {@link Student}
+	 */
 	public void InitStudentMock() {
 		Mockito.when(studentMock.getId()).thenReturn(codigoEstudante);
 		Mockito.when(studentMock.getCourse()).thenReturn(codigoCurso);
@@ -414,6 +457,14 @@ class AlunoSituacaoControllerTest {
 		Mockito.when(studentMock.getClasses(ClassStatus.REPROVED_GRADE)).thenReturn(reprovedClasses);
 	}
 
+	/**
+	 * Inicializa uma disciplina e constrói o mock para o método da classe {@link DisciplinaRepository}
+	 * para a busca ser realizada corretamente
+	 *
+	 * @param codigoDisciplina O código da disciplina a ser mockada
+	 * @param nomeDisciplina   O nome da disciplina a ser mockada
+	 * @param cargaHoraria     A carga horária da disciplina a ser mockada
+	 */
 	public void InitDisciplinaStubAndMock(String codigoDisciplina, String nomeDisciplina, int cargaHoraria) {
 		Disciplina disciplina1Stub = new Disciplina();
 		disciplina1Stub.setCodigo(codigoDisciplina);
