@@ -27,7 +27,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.Serializable;
 import java.text.Normalizer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 @Named
 @ViewScoped
@@ -297,81 +300,85 @@ public class AlunoSituacaoController
         dataTable.reset();
     }
 
-    public void gerarDadosAluno(Student st, Curriculum cur) {
-        HashMap<Class, ArrayList<String[]>> aprovado;
-        listaDisciplinaObrigatorias = new ArrayList<>();
-        listaDisciplinaEletivas = new ArrayList<>();
-        listaDisciplinaOpcionais = new ArrayList<>();
-        horasObrigatorias = 0;
-        aprovado = new HashMap<>(st.getClasses(ClassStatus.APPROVED));
-        TreeSet<String> naocompletado = new TreeSet<>();
+    private SituacaoDisciplina getSituacaoDisciplina(Class classe, String situacaoDisciplina, boolean processaPreRequisitos, boolean processaCorequisitos) {
+        SituacaoDisciplina disciplinaSituacao = new SituacaoDisciplina();
+        disciplinaSituacao.setSituacao(situacaoDisciplina);
+        disciplinaSituacao.setCodigo(classe.getId());
+        disciplinaSituacao.setCargaHoraria(Integer.toString(classe.getWorkload()));
+        disciplinaSituacao.setNome(disciplinas.buscarPorCodigoDisciplina(classe.getId()).getNome());
+
+        StringBuilder requisitos = new StringBuilder();
+
+        if (processaPreRequisitos) {
+            constroiRequisitos(classe.getPrerequisite(), requisitos);
+        }
+
+        if (processaCorequisitos) {
+            constroiRequisitos(classe.getCorequisite(), requisitos);
+        }
+
+        disciplinaSituacao.setListaPreRequisitos(requisitos.toString());
+
+        return disciplinaSituacao;
+    }
+
+    private void constroiRequisitos(List<Class> classList, StringBuilder stringRequisitos) {
+        for (Class cl : classList) {
+            stringRequisitos.insert(0, cl.getId() + " : ");
+        }
+    }
+
+    private void processaDisciplinasObrigatorias(Curriculum curriculo, HashMap<Class, ArrayList<String[]>> disciplinasAprovadas) {
         boolean lgPeriodoAtual = false;
-        for (int i : cur.getMandatories().keySet()) {
-            for (Class c : cur.getMandatories().get(i)) {
+        for (int i : curriculo.getMandatories().keySet()) {
+            for (Class c : curriculo.getMandatories().get(i)) {
                 horasObrigatorias = horasObrigatorias + c.getWorkload();
-                if (!aprovado.containsKey(c)) {
+                if (!disciplinasAprovadas.containsKey(c)) {
                     if (!lgPeriodoAtual) {
                         aluno.setPeriodoReal(i);
                         lgPeriodoAtual = true;
                     }
-                    naocompletado.add(c.getId());
 
-                    SituacaoDisciplina disciplinaSituacao = new SituacaoDisciplina();
-                    disciplinaSituacao.setSituacao(NAO_APROVADO);
-                    disciplinaSituacao.setCodigo(c.getId());
+                    SituacaoDisciplina disciplinaSituacao = getSituacaoDisciplina(c, NAO_APROVADO, true, true);
                     disciplinaSituacao.setPeriodo(Integer.toString(i));
-                    disciplinaSituacao.setCargaHoraria(Integer.toString(c.getWorkload()));
-                    disciplinaSituacao.setNome(disciplinas.buscarPorCodigoDisciplina(c.getId()).getNome());
-                    String preRequisito = "";
-
-                    for (Class cl : c.getPrerequisite()) {
-                        preRequisito = cl.getId() + " : " + preRequisito;
-                    }
-                    for (Class cl : c.getCorequisite()) {
-                        preRequisito = cl.getId() + " : " + preRequisito;
-                    }
-
-                    disciplinaSituacao.setListaPreRequisitos(preRequisito);
                     listaDisciplinaObrigatorias.add(disciplinaSituacao);
                 } else {
 
-                    SituacaoDisciplina disciplinaSituacao = new SituacaoDisciplina();
-                    disciplinaSituacao.setCodigo(c.getId());
-                    disciplinaSituacao.setSituacao(APROVADO);
+                    SituacaoDisciplina disciplinaSituacao = getSituacaoDisciplina(c, APROVADO, true, false);
                     disciplinaSituacao.setPeriodo(Integer.toString(i));
-                    disciplinaSituacao.setCargaHoraria(Integer.toString(c.getWorkload()));
-                    disciplinaSituacao.setNome(disciplinas.buscarPorCodigoDisciplina(c.getId()).getNome());
-                    String preRequisito = "";
-
-                    for (Class cl : c.getPrerequisite()) {
-                        if (!preRequisito.contains(cl.getId())) {
-                            preRequisito = cl.getId() + " : " + preRequisito;
-                        }
-                    }
-                    disciplinaSituacao.setListaPreRequisitos(preRequisito);
                     listaDisciplinaObrigatorias.add(disciplinaSituacao);
-                    aprovado.remove(c);
+
+                    disciplinasAprovadas.remove(c);
                 }
             }
         }
-        for (Class c : cur.getElectives()) {
-            if (aprovado.containsKey(c)) {
-                SituacaoDisciplina disciplinaSituacao = new SituacaoDisciplina();
-                disciplinaSituacao.setCodigo(c.getId());
-                disciplinaSituacao.setSituacao(APROVADO);
+    }
+
+    private void processaDisciplinasEletivas(Curriculum curriculo, HashMap<Class, ArrayList<String[]>> disciplinasAprovadas) {
+        for (Class c : curriculo.getElectives()) {
+            if (disciplinasAprovadas.containsKey(c)) {
                 logger.info(c.getId() + " eletiva");
-                disciplinaSituacao.setCargaHoraria(Integer.toString(c.getWorkload()));
-                disciplinaSituacao.setNome(disciplinas.buscarPorCodigoDisciplina(c.getId()).getNome());
+                SituacaoDisciplina disciplinaSituacao = getSituacaoDisciplina(c, APROVADO, false, false);
                 listaDisciplinaEletivas.add(disciplinaSituacao);
-                aprovado.remove(c);
+                disciplinasAprovadas.remove(c);
             }
         }
+    }
 
-        Set<Class> ap = aprovado.keySet();
-        Iterator<Class> i = ap.iterator();
-        while (i.hasNext()) {
-            Class c = i.next();
-            ArrayList<String[]> classdata = aprovado.get(c);
+    public void gerarDadosAluno(Student st, Curriculum cur) {
+        HashMap<Class, ArrayList<String[]>> disciplinasAprovadas;
+        listaDisciplinaObrigatorias = new ArrayList<>();
+        listaDisciplinaEletivas = new ArrayList<>();
+        listaDisciplinaOpcionais = new ArrayList<>();
+        horasObrigatorias = 0;
+
+        disciplinasAprovadas = new HashMap<>(st.getClasses(ClassStatus.APPROVED));
+        processaDisciplinasObrigatorias(cur, disciplinasAprovadas);
+        processaDisciplinasEletivas(cur, disciplinasAprovadas);
+
+        Set<Class> ap = disciplinasAprovadas.keySet();
+        for (Class c : ap) {
+            ArrayList<String[]> classdata = disciplinasAprovadas.get(c);
             for (String[] s2 : classdata) {
                 if (s2[1].equals("APR") || s2[1].equals("A")) {
                     EventoAce evento = new EventoAce();
