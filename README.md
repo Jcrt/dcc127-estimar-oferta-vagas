@@ -19,8 +19,9 @@ Repositório com a versão web do sistema, para aplicação de técnicas de enge
 2. A versão do Java deve ser a 17 para que o Sonarqube consiga fazer a análise corretamente, conforme [este tutorial](https://docs.sonarqube.org/latest/requirements/prerequisites-and-overview/).
 3. Após a instalação do Maven, adicionar a pasta `<pasta onde você descompactou feliz e contente o maven>\bin` na variável de ambiente 'path'.
 4. Após clonar o projeto na sua estação de trabalho e abrí-lo usando o [IntelliJ IDEA](https://www.jetbrains.com/idea/download/), lembre-se de alterar a versão do Java para a que está instalada na sua máquina 💡.
-5. Restaure as dependências do Maven com o comando  `mvn dependency:resolve` ou peça para o IntelliJ fazer isso para você.
-6. Crie um arquivo de configuração com o nome `config.txt` no diretório `/src/main/webapp/WEB-INF`, com a seguinte estrutura:
+5. Instale o Jar `estimar-oferta-vagas-2019` utilizando o comando `mvn install:install-file -Dfile=libs\estimar-oferta-vagas\estimar-oferta-vagas-2019\1.0.0\estimar-oferta-vagas-2019-1.0.0.jar -DgroupId=com.ufjf -DartifactId=estimar-oferta-vagas-2019 -Dversion=1.0 -Dpackaging=jar` à partir do diretório raiz do repositório.
+6. Restaure as dependências do Maven com o comando  `mvn dependency:resolve` ou peça para o IntelliJ fazer isso para você.
+7. Crie um arquivo de configuração com o nome `config.txt` no diretório `/src/main/webapp/WEB-INF`, com a seguinte estrutura:
 	```
 	JDBC.URL = jdbc:mysql://<seu endpoint de banco de dados>/<nome banco de dados>*
 	JDBC.USER = <usuário do banco de dados>
