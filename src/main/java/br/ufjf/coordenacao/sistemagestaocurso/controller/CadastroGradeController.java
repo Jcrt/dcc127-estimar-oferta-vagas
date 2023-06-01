@@ -1,43 +1,37 @@
 package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.view.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import br.ufjf.coordenacao.sistemagestaocurso.controller.util.Ordenar;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
+import br.ufjf.coordenacao.sistemagestaocurso.model.*;
+import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.DisciplinaGradeDisciplina;
+import br.ufjf.coordenacao.sistemagestaocurso.repository.*;
+import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
+import br.ufjf.coordenacao.sistemagestaocurso.util.jpa.Transactional;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.primefaces.component.datatable.DataTable;
 
-import br.ufjf.coordenacao.sistemagestaocurso.controller.util.Ordenar;
-import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Equivalencia;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
-import br.ufjf.coordenacao.sistemagestaocurso.model.GradeDisciplina;
-import br.ufjf.coordenacao.sistemagestaocurso.model.PreRequisito;
-import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.DisciplinaGradeDisciplina;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.EquivalenciaRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.GradeDisciplinaRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.GradeRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.PreRequisitoRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
-import br.ufjf.coordenacao.sistemagestaocurso.util.jpa.Transactional;
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
-@Named 
+@Named
 @ViewScoped
 public class CadastroGradeController implements Serializable {
+
+	static final String OBRIGATORIA = "Obrigatoria";
+	static final String PRINCIPAL_FORM_GRID_OBRIGATORIAS = "principalForm:gridObrigatorias";
+	static final String PRINCIPAL_FORM_GRID_ELETIVAS = "principalForm:gridEletivas";
+	static final String PRINCIPAL_FORM_GRID_EQUIVALENCIAS = "principalForm:gridEquivalencias";
+	static final String PRINCIPAL_FORM_GRID_IRA = "principalForm:gridIra";
 
 	//========================================================= VARIABLES ==================================================================================//
 
@@ -46,7 +40,7 @@ public class CadastroGradeController implements Serializable {
 	private boolean lgHorasAoe = true;
 	private boolean lgMaxPeriodo = true;
 	private boolean lgExcluirGrade = true;
-	private boolean lgIncluirGrade = true;	
+	private boolean lgIncluirGrade = true;
 	private boolean lgCodigoGrade = false;
 	private boolean lgHorasEletivas = true;
 	private boolean lgNomeDisciplina = true;	
@@ -65,20 +59,20 @@ public class CadastroGradeController implements Serializable {
 	private boolean lgCodigoDisciplinaEquivalenciaDois = true;
 	private boolean lgDisciplinaIra = true;
 
-	private List<Equivalencia> listaEquivalenciaSelecionada ;
-	private List<Equivalencia> listaEquivalencia = new ArrayList<Equivalencia>();	
-	private List<DisciplinaGradeDisciplina> listaEletivasSelecionada ;
-	private List<DisciplinaGradeDisciplina> listaObrigatoriasSelecionada ;
-	private List<DisciplinaGradeDisciplina> listaEletivas = new ArrayList<DisciplinaGradeDisciplina>();
-	private List<DisciplinaGradeDisciplina> listaObrigatorias = new ArrayList<DisciplinaGradeDisciplina>();		
-	private List<GradeDisciplina> listaIra = new ArrayList<GradeDisciplina>();	
-	private List<GradeDisciplina> listaIraSelecionados ;
-	private List<PreRequisito> listaPreRequisitos = new ArrayList<PreRequisito>();	
+	private List<Equivalencia> listaEquivalenciaSelecionada;
+	private List<Equivalencia> listaEquivalencia = new ArrayList<>();
+	private List<DisciplinaGradeDisciplina> listaEletivasSelecionada;
+	private List<DisciplinaGradeDisciplina> listaObrigatoriasSelecionada;
+	private List<DisciplinaGradeDisciplina> listaEletivas = new ArrayList<>();
+	private List<DisciplinaGradeDisciplina> listaObrigatorias = new ArrayList<>();
+	private List<GradeDisciplina> listaIra = new ArrayList<>();
+	private List<GradeDisciplina> listaIraSelecionados;
+	private List<PreRequisito> listaPreRequisitos = new ArrayList<>();
 
-	private Grade grade = new Grade();	
+	private Grade grade = new Grade();
 	private Curso curso = new Curso();
-	private Ordenar ordenar = new Ordenar();
-	private Disciplina disciplina = new Disciplina();	
+	private final Ordenar ordenar = new Ordenar();
+	private Disciplina disciplina = new Disciplina();
 	private Disciplina disciplinaPre = new Disciplina();
 	private Disciplina disciplinaNova = new Disciplina();
 	private Disciplina disciplinaIra = new Disciplina();
@@ -94,21 +88,24 @@ public class CadastroGradeController implements Serializable {
 	private GradeRepository gradeDAO ;
 	
 	@Inject
-	private DisciplinaRepository disciplinaDAO ;
-	
+	private DisciplinaRepository disciplinaDAO;
+
 	@Inject
-	private PreRequisitoRepository preRequisitoDAO ;
-	
+	private PreRequisitoRepository preRequisitoDAO;
+
 	@Inject
-	private EquivalenciaRepository equivalenciaDAO ;
-	
+	private EquivalenciaRepository equivalenciaDAO;
+
 	@Inject
-	private GradeDisciplinaRepository gradeDisciplinaDAO ;
+	private GradeDisciplinaRepository gradeDisciplinaDAO;
+
+	@Inject
+	private FacesContext facesContext;
 
 	private String tipoPre;
 	private EstruturaArvore estruturaArvore;
-	
-	private Logger logger = Logger.getLogger(CadastroGradeController.class);
+
+	private final Logger logger = Logger.getLogger(CadastroGradeController.class);
 
 	//========================================================= METODOS ==================================================================================//
 
@@ -119,21 +116,17 @@ public class CadastroGradeController implements Serializable {
 	public void init() {
 		estruturaArvore = EstruturaArvore.getInstance();
 		usuarioController.atualizarPessoaLogada();
-		//grade.setCodigo("12014");
-		curso = usuarioController.getAutenticacao().getCursoSelecionado();//ursoDAO.buscarPorCodigo(usuarioController.getAutenticacao().getCursoSelecionado().getCodigo());	
+		curso = usuarioController.getAutenticacao().getCursoSelecionado();
 	}
 
-	public List<String> gradeCodigos(String codigo) {	
-		
+	public List<String> gradeCodigos(String codigo) {
 		codigo = codigo.toUpperCase();
-		List<String> todos = new ArrayList<String>();
-		
-			for (Grade gradeQuestao : this.gradeDAO.buscarTodosCodigosGradePorCurso(this.curso.getId())){
-				if(gradeQuestao.getCodigo().contains(codigo)){
-					todos.add(gradeQuestao.getCodigo()); 
-				}
+		List<String> todos = new ArrayList<>();
+		for (Grade gradeQuestao : this.gradeDAO.buscarTodosCodigosGradePorCurso(this.curso.getId())) {
+			if (gradeQuestao.getCodigo().contains(codigo)) {
+				todos.add(gradeQuestao.getCodigo());
 			}
-		
+		}
 		return todos;
 	}
 
@@ -150,34 +143,22 @@ public class CadastroGradeController implements Serializable {
 		usuarioController.atualizarPessoaLogada();
 		
 		FacesMessage msg = new FacesMessage("Nova grade cadastrada!");
-		FacesContext.getCurrentInstance().addMessage(null, msg);
-		
+		facesContext.addMessage(null, msg);
 	}
 	
 	//TODO: Refatorar isso aqui
 	public void buscarGrade(){
-
-		Grade gradeAuxiliar = new Grade();
 		disciplina = new Disciplina();
 		gradeDisciplina = new GradeDisciplina();
 
 		grade.setCodigo(grade.getCodigo().trim().toUpperCase());
 
-		/*for(Grade gradeSelecionada : curso.getGrupoGrades()){
-			if (gradeSelecionada.getCodigo().equals(grade.getCodigo())){
-				gradeAuxiliar = gradeSelecionada;
-				achouGrade = true;
-				break;
-			}
-		}
-		*/
-		
-		gradeAuxiliar = gradeDAO.buscarPorCodigoGrade(grade.getCodigo(), curso);
+		Grade gradeAuxiliar = gradeDAO.buscarPorCodigoGrade(grade.getCodigo(), curso);
 		
 		if (gradeAuxiliar != null) {
 			grade = gradeAuxiliar;
 			FacesMessage msg = new FacesMessage("Grade encontrada!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			lgCodigoGrade = true;
 			lgHorasEletivas = false;
 			lgHorasOpcionais  = false;
@@ -207,7 +188,7 @@ public class CadastroGradeController implements Serializable {
 			}
 			else {
 				FacesMessage msg = new FacesMessage("Preencha o campo Código Grade!");
-				FacesContext.getCurrentInstance().addMessage(null, msg);
+				facesContext.addMessage(null, msg);
 				return;
 			}
 
@@ -235,61 +216,30 @@ public class CadastroGradeController implements Serializable {
 
 	@Transactional
 	public void excluirGrade(){
-
-		/*for(Grade gradeSelecionada : curso.getGrupoGrades()){
-			if (gradeSelecionada.getCodigo().equals(grade.getCodigo())){
-				grade = gradeSelecionada;
-				break;
-			}
-		}
-
-		List<GradeDisciplina> listaGradeDisciplina = grade.getGrupoGradeDisciplina();
-
-		if (listaGradeDisciplina != null){
-			for (GradeDisciplina gradeDisiplinaDeleta : listaGradeDisciplina){
-				List<PreRequisito> listaPre = gradeDisiplinaDeleta.getPreRequisito();
-				if (listaPre != null){
-					for (PreRequisito preReq:listaPre){
-						preRequisitoDAO.removePeloId(preReq.getId());
-					}
-				}
-				gradeDisciplinaDAO.removePeloId(gradeDisiplinaDeleta.getId());
-			}
-		}
-
-		ArrayList<Equivalencia> listaEquivalencia = equivalenciaDAO.buscarTodasEquivalenciasPorGrade(grade.getId());		
-		if (listaEquivalencia != null){			
-			for (Equivalencia equivalenciaDeletar :listaEquivalencia ){				
-				equivalenciaDAO.removePeloId(equivalenciaDeletar.getId());			
-
-			}			
-		}*/
 		curso.getGrupoGrades().remove(grade);
 		gradeDAO.remover(grade);
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
 		usuarioController.atualizarPessoaLogada();
-		
-		//estruturaArvore.resetarCursoDAO();
-		limpaGrade();
 
+		limpaGrade();
 	}
 
-	public void limpaGrade(){
+	public void limpaGrade() {
 
 		grade = new Grade();
 		disciplina = new Disciplina();
 		gradeDisciplina = new GradeDisciplina();
-		listaEquivalencia = new ArrayList<Equivalencia>();
-		listaIra = new ArrayList<GradeDisciplina>();
+		listaEquivalencia = new ArrayList<>();
+		listaIra = new ArrayList<>();
 		lgCodigoGrade = false;
 		lgHorasEletivas = true;
-		lgHorasOpcionais  = true;
+		lgHorasOpcionais = true;
 		lgHorasAoe = true;
 		lgMaxPeriodo = true;
 		lgIncluirGrade = true;
 		lgCodigoDisciplina = true;
-		lgNomeDisciplina = true;	
+		lgNomeDisciplina = true;
 		lgPeriodoDisciplina = true;
 		lgCargaHorariaDisciplina = true;
 		lgTipoDisciplina = true;
@@ -303,85 +253,81 @@ public class CadastroGradeController implements Serializable {
 		lgLimparEquivalencia = true;
 		lgDisciplinaIra = true;
 		lgExcluirGrade = true;
-		listaObrigatorias = new ArrayList<DisciplinaGradeDisciplina>();
-		listaEletivas = new ArrayList<DisciplinaGradeDisciplina>();
+		listaObrigatorias = new ArrayList<>();
+		listaEletivas = new ArrayList<>();
 
-		DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridObrigatorias");
-		dataTable.clearInitialState();
-		dataTable.reset();
+		resetDataTables();
 
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridEletivas");
-		dataTable.clearInitialState();
-		dataTable.reset();
-
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridEquivalencias");
-		dataTable.clearInitialState();
-		dataTable.reset();		
-
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridIra");
-		dataTable.clearInitialState();
-		dataTable.reset();
-		
 		init();
 
 	}
 
+	/**
+	 * Reseta todas as {@link DataTable}s da tela
+	 */
+	private void resetDataTables() {
+		resetDataTableByDataTableId(PRINCIPAL_FORM_GRID_OBRIGATORIAS);
+		resetDataTableByDataTableId(PRINCIPAL_FORM_GRID_ELETIVAS);
+		resetDataTableByDataTableId(PRINCIPAL_FORM_GRID_EQUIVALENCIAS);
+		resetDataTableByDataTableId(PRINCIPAL_FORM_GRID_IRA);
+	}
+
+	/**
+	 * Reseta {@link DataTable} usando o método {@link DataTable#reset()}
+	 *
+	 * @param dataTableId O id da {@link DataTable} que será resetada
+	 */
+	private void resetDataTableByDataTableId(String dataTableId) {
+		DataTable dataTable = (DataTable) facesContext.getViewRoot().findComponent(dataTableId);
+		dataTable.clearInitialState();
+		dataTable.reset();
+	}
+
 	@Transactional
-	public void alterarGrade(){
+	public void alterarGrade() {
 		gradeDAO.persistir(grade);
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
-		
+
 		usuarioController.atualizarPessoaLogada();
 	}
 
-	public void alteraCampoPeriodo(){
+	public void alteraCampoPeriodo() {
 
-		if(gradeDisciplina.getTipoDisciplina().equals("Obrigatoria")){
-			lgPeriodoDisciplina = false;
-		}
-		else{
-			lgPeriodoDisciplina = true;
-		}
+		lgPeriodoDisciplina = !gradeDisciplina.getTipoDisciplina().equals(OBRIGATORIA);
 	}
 
-	public List<String> disciplinaCodigos(String codigo) {	
-		codigo = codigo.toUpperCase();
-		List<String> todos = disciplinaDAO.buscarTodosCodigosDisciplina(codigo);
-		return todos;
+	public List<String> disciplinaCodigos(String codigo) {
+		return disciplinaDAO.buscarTodosCodigosDisciplina(codigo.toUpperCase());
 	}
 
-	public List<Disciplina> disciplinaNomes(String codigo) {	
-		codigo = codigo.toUpperCase();
-		List<Disciplina> todos = disciplinaDAO.buscarTodosNomesDisciplinaObjeto(codigo);
-		return todos;
+	public List<Disciplina> disciplinaNomes(String codigo) {
+		return disciplinaDAO.buscarTodosNomesDisciplinaObjeto(codigo.toUpperCase());
 	}
 
-	public List<Disciplina> disciplinaNomesEquivalencia(String codigo) {	
+	public List<Disciplina> disciplinaNomesEquivalencia(String codigo) {
 
-		List<Disciplina> listaNomesSelecionados = new ArrayList<Disciplina>();
-		List<DisciplinaGradeDisciplina> newList = new ArrayList<DisciplinaGradeDisciplina>(listaObrigatorias);
+		List<Disciplina> listaNomesSelecionados = new ArrayList<>();
+		List<DisciplinaGradeDisciplina> newList = new ArrayList<>(listaObrigatorias);
 		newList.addAll(listaEletivas);
-		for (DisciplinaGradeDisciplina disciplina:newList ){
-			if (disciplina.getDisciplina().getNome().indexOf(codigo.toUpperCase()) >= 0){
-				listaNomesSelecionados.add(disciplina.getDisciplina());
+		for (DisciplinaGradeDisciplina disciplinaGradeDisciplina : newList) {
+			if (disciplinaGradeDisciplina.getDisciplina().getNome().contains(codigo.toUpperCase())) {
+				listaNomesSelecionados.add(disciplinaGradeDisciplina.getDisciplina());
 			}
 		}
-		codigo = codigo.toUpperCase();
 		return listaNomesSelecionados;
 	}
 
-	public List<Disciplina> disciplinaCodigoEquivalencia(String codigo) {	
+	public List<Disciplina> disciplinaCodigoEquivalencia(String codigo) {
 
-		List<Disciplina> listaNomesSelecionados = new ArrayList<Disciplina>();
-		List<DisciplinaGradeDisciplina> newList = new ArrayList<DisciplinaGradeDisciplina>(listaObrigatorias);
+		List<Disciplina> listaNomesSelecionados = new ArrayList<>();
+		List<DisciplinaGradeDisciplina> newList = new ArrayList<>(listaObrigatorias);
 		newList.addAll(listaEletivas);
-		for (DisciplinaGradeDisciplina disciplina:newList ){
-			if (disciplina.getDisciplina().getCodigo().indexOf(codigo.toUpperCase()) >= 0){
-				listaNomesSelecionados.add(disciplina.getDisciplina());
+		for (DisciplinaGradeDisciplina disciplinaGradeDisciplina : newList) {
+			if (disciplinaGradeDisciplina.getDisciplina().getCodigo().contains(codigo.toUpperCase())) {
+				listaNomesSelecionados.add(disciplinaGradeDisciplina.getDisciplina());
 			}
 		}
-		codigo = codigo.toUpperCase();
 		return listaNomesSelecionados;
 	}
 
@@ -403,30 +349,29 @@ public class CadastroGradeController implements Serializable {
 		disciplinaNova.setCodigo(disciplinaNova.getCodigo().trim());
 		disciplinaNova.setNome(disciplinaNova.getNome().trim());
 		Disciplina disciplinaExiste = disciplinaDAO.buscarPorCodigoDisciplina(disciplinaNova.getCodigo());
-		if (disciplinaNova.getCodigo() == ""){
+		if (disciplinaNova.getCodigo().equals("")) {
 			FacesMessage msg = new FacesMessage("Preencha o campo Código!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
-		if (disciplinaNova.getNome() == ""){
+		if (disciplinaNova.getNome().equals("")) {
 			FacesMessage msg = new FacesMessage("Preencha o campo Nome!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
-		if (disciplinaNova.getCargaHoraria() == null){
+		if (disciplinaNova.getCargaHoraria() == null) {
 			FacesMessage msg = new FacesMessage("Preencha o campo Carga Horária!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
 		if (disciplinaExiste != null){
 			FacesMessage msg = new FacesMessage("Disciplina já existe");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
-			return;
+			facesContext.addMessage(null, msg);
 		}
 		else {
 			disciplinaDAO.persistir(disciplinaNova);
 			FacesMessage msg = new FacesMessage("Disciplina cadastrada!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			disciplinaNova =  new Disciplina();
 			
 			Hibernate.initialize(grade.getGrupoAlunos());
@@ -435,7 +380,6 @@ public class CadastroGradeController implements Serializable {
 			{
 				a.dadosAlterados();
 			}
-			
 		}
 	}
 
@@ -468,9 +412,7 @@ public class CadastroGradeController implements Serializable {
 	}
 
 	public void onItemSelectNomeDisciplinaEquivalenciaUm() {
-
-		lgCodigoDisciplinaEquivalenciaUm = true;
-		lgNomeDisciplinaEquivalenciaUm = true;	
+		onItemSelectCodigoDisciplinaEquivalenciaUm();
 	}
 
 	public void onItemSelectDisciplinaIra() {
@@ -500,73 +442,58 @@ public class CadastroGradeController implements Serializable {
 
 		}
 
-		if(disciplina.getCodigo().equals("")){
+		if (disciplina.getCodigo().equals("")) {
 
 			FacesMessage msg = new FacesMessage("Preencha o campo Código Disciplina!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
 
-		if (disciplina.getId() == null){
-
-			if (disciplina.getNome() == null || disciplina.getNome().equals("")){
-
-				FacesMessage msg = new FacesMessage("Preencha o campo Nome Disciplina!");
-				FacesContext.getCurrentInstance().addMessage(null, msg);
-				return;
-			}
+		if (disciplina.getId() == null
+				&& (disciplina.getNome() == null || disciplina.getNome().equals(""))) {
+			FacesMessage msg = new FacesMessage("Preencha o campo Nome Disciplina!");
+			facesContext.addMessage(null, msg);
+			return;
 		}
 
-		if(gradeDisciplina.getTipoDisciplina() == ""){
+		if (gradeDisciplina.getTipoDisciplina().equals("")) {
 
 			FacesMessage msg = new FacesMessage("Preencha o campo Tipo Disciplina!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
 
-		if(gradeDisciplina.getTipoDisciplina().equals("Obrigatoria") && gradeDisciplina.getPeriodo() == 0){
+		if (gradeDisciplina.getTipoDisciplina().equals(OBRIGATORIA) && gradeDisciplina.getPeriodo() == 0) {
 
 			FacesMessage msg = new FacesMessage("Preencha o campo Período!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 
 		}
 
 		gradeDisciplina.setDisciplina(disciplina);
-		gradeDisciplina.setGrade(grade);	
-		//List<GradeDisciplina> todos = gradeDisciplinaDAO.buscarTodasGradeDisciplinaPorGrade(grade.getId());
+		gradeDisciplina.setGrade(grade);
 
 		GradeDisciplina gdDisciplinaAntiga = gradeDisciplinaDAO.buscarPorDisciplinaGrade(grade.getId(), disciplina.getId());
-		if(gdDisciplinaAntiga != null)
-		{
+		if (gdDisciplinaAntiga != null) {
 			FacesMessage msg = new FacesMessage("Disciplina já cadastrada nesta grade!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
-		
-		/*for (GradeDisciplina g:todos){
-			if(g.getDisciplina().getCodigo().equals(disciplina.getCodigo()) ){
-				FacesMessage msg = new FacesMessage("Disciplina já cadastrada nesta grade!");
-				FacesContext.getCurrentInstance().addMessage(null, msg);
-				return;
-			}
-		}*/
 
-		if (!gradeDisciplina.getTipoDisciplina().equals("Obrigatoria") ){			
+		if (!gradeDisciplina.getTipoDisciplina().equals(OBRIGATORIA)) {
 			gradeDisciplina.setPeriodo((long) 0);
 		}
 
 		gradeDisciplina.setExcluirIra(false);
-		gradeDisciplina = gradeDisciplinaDAO.persistir(gradeDisciplina);	
-		DisciplinaGradeDisciplina disciplinaGradeDisciplina  = new DisciplinaGradeDisciplina();
+		gradeDisciplina = gradeDisciplinaDAO.persistir(gradeDisciplina);
+		DisciplinaGradeDisciplina disciplinaGradeDisciplina = new DisciplinaGradeDisciplina();
 		disciplinaGradeDisciplina.setDisciplina(disciplina);
-		disciplinaGradeDisciplina.setGradeDisciplina(gradeDisciplina);	
+		disciplinaGradeDisciplina.setGradeDisciplina(gradeDisciplina);
 
-		if (gradeDisciplina.getTipoDisciplina().equals("Obrigatoria") ){
+		if (gradeDisciplina.getTipoDisciplina().equals(OBRIGATORIA)) {
 			listaObrigatorias.add(disciplinaGradeDisciplina);
-		}
-
-		else {
+		} else {
 			listaEletivas.add(disciplinaGradeDisciplina);
 		}
 
@@ -587,21 +514,8 @@ public class CadastroGradeController implements Serializable {
 		lgCargaHorariaDisciplina = false;	
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
-		
-		DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridObrigatorias");
-		dataTable.clearInitialState();
-		dataTable.reset();
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridEletivas");
-		dataTable.clearInitialState();
-		dataTable.reset();
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridEquivalencias");
-		dataTable.clearInitialState();
-		dataTable.reset();	
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridIra");
-		dataTable.clearInitialState();
-		dataTable.reset();
-		
-		//usuarioController.atualizarPessoaLogada();
+
+		resetDataTables();
 	}	
 
 	@Transactional
@@ -612,48 +526,32 @@ public class CadastroGradeController implements Serializable {
 		listaObrigatorias.remove(linhaSelecionada);
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
-		
-		//usuarioController.atualizarPessoaLogada();
+
 		atualizaGrids();
 	}
 
-	public void atualizaGrids(){
+	public void atualizaGrids() {
+		resetDataTables();
 
-		DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridObrigatorias");
-		dataTable.clearInitialState();
-		dataTable.reset();
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridEletivas");
-		dataTable.clearInitialState();
-		dataTable.reset();
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridEquivalencias");
-		dataTable.clearInitialState();
-		dataTable.reset();	
-		dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("principalForm:gridIra");
-		dataTable.clearInitialState();
-		dataTable.reset();
-		listaEquivalencia = new ArrayList<Equivalencia>();			
-		listaEletivas = new ArrayList<DisciplinaGradeDisciplina>();
-		listaObrigatorias = new ArrayList<DisciplinaGradeDisciplina>();
-		//listaEquivalencia = equivalenciaDAO.buscarTodasEquivalenciasPorGrade(grade.getId());
+		listaEquivalencia = new ArrayList<>();
+		listaEletivas = new ArrayList<>();
+		listaObrigatorias = new ArrayList<>();
 		listaEquivalencia = equivalenciaDAO.buscarTodasEquivalenciasPorGrade(grade.getId());
-		listaIra = new ArrayList<GradeDisciplina>();
+		listaIra = new ArrayList<>();
 
 		List<GradeDisciplina> todos = gradeDisciplinaDAO.buscarTodasGradeDisciplinaPorGrade(grade.getId());
-		//List<GradeDisciplina> todos = grade.getGrupoGradeDisciplina();	
-		for(GradeDisciplina gradeDisciplinaSelecionada : todos){
-			if(gradeDisciplinaSelecionada.getExcluirIra() != null && gradeDisciplinaSelecionada.getExcluirIra() == true){		
+		for (GradeDisciplina gradeDisciplinaSelecionada : todos) {
+			if (gradeDisciplinaSelecionada.getExcluirIra() != null && gradeDisciplinaSelecionada.getExcluirIra()) {
 				listaIra.add(gradeDisciplinaSelecionada);
 			}
 		}
-		//listaIra = gradeDisciplinaDAO.buscarPorIra(grade.getId(), true);
-		while(!todos.isEmpty()){ 
-			DisciplinaGradeDisciplina disciplinaGradeDisciplina  = new DisciplinaGradeDisciplina();
+		while (!todos.isEmpty()) {
+			DisciplinaGradeDisciplina disciplinaGradeDisciplina = new DisciplinaGradeDisciplina();
 			disciplinaGradeDisciplina.setDisciplina(todos.get(0).getDisciplina());
-			disciplinaGradeDisciplina.setGradeDisciplina(todos.get(0));	
-			if (todos.get(0).getTipoDisciplina().equals("Obrigatoria")){
+			disciplinaGradeDisciplina.setGradeDisciplina(todos.get(0));
+			if (todos.get(0).getTipoDisciplina().equals(OBRIGATORIA)) {
 				listaObrigatorias.add(disciplinaGradeDisciplina);
-			}
-			else{
+			} else {
 				listaEletivas.add(disciplinaGradeDisciplina);
 			}
 			ordenar.DisciplinaGradeDisciplinaOrdenarCodigo(listaObrigatorias);
@@ -661,20 +559,16 @@ public class CadastroGradeController implements Serializable {
 			ordenar.DisciplinaGradeDisciplinaOrdenarCodigo(listaEletivas);
 			todos.remove(0);
 		}
-		
+
 		listaEletivasSelecionada =  null;
-	    listaObrigatoriasSelecionada  =  null;
-	    listaIraSelecionados = null;
-		
+		listaObrigatoriasSelecionada  =  null;
+		listaIraSelecionados = null;
+
 	}
 
 	@Transactional
 	public void incluiPreRequisitos (){
-		
-		
 		PreRequisito preRequisito  = new PreRequisito();
-
-		preRequisito  = new PreRequisito();
 
 		disciplinaPre = disciplinaDAO.buscarPorCodigoDisciplina(disciplinaPre.getCodigo());
 
@@ -684,20 +578,17 @@ public class CadastroGradeController implements Serializable {
 
 		preRequisito.setTipo(tipoPre);
 
-		if ( disciplinaPre == null || disciplinaPre.getCodigo() == "" ){
+		if (disciplinaPre == null || disciplinaPre.getCodigo().equals("")) {
 
 			FacesMessage msg = new FacesMessage("Preencha o campo Código!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
-
-
-
 		}
 
-		if (tipoPre == ""){
+		if (tipoPre.equals("")) {
 
 			FacesMessage msg = new FacesMessage("Selecione o Tipo de Pré-Requsito!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
 
@@ -706,7 +597,7 @@ public class CadastroGradeController implements Serializable {
 		if(idPreprocurado != 0){
 
 			FacesMessage msg = new FacesMessage("Pre-Requisito já cadastrado!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			disciplinaPre = new Disciplina();
 			tipoPre = "";
 			return;
@@ -716,7 +607,7 @@ public class CadastroGradeController implements Serializable {
 		if(disciplinaPre.getCodigo().equals(linhaSelecionada.getDisciplina().getCodigo())){
 
 			FacesMessage msg = new FacesMessage("Não é possível incluir como pré-requisito a própria disciplina!!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			disciplinaPre = new Disciplina();
 			tipoPre = "";
 			return;
@@ -735,17 +626,18 @@ public class CadastroGradeController implements Serializable {
 
 	}
 
-	public void carregaPreRequisitos(){
+	public void carregaPreRequisitos() {
 
-		listaPreRequisitos = new ArrayList<PreRequisito>();
-		String pre = "";		
-		
+		listaPreRequisitos = new ArrayList<>();
+
+		StringBuilder pre = new StringBuilder();
+
 		List<PreRequisito> todos = preRequisitoDAO.buscarPorTodosCodigoGradeDisc(linhaSelecionada.getGradeDisciplina().getId());
-		while(!todos.isEmpty()){  
-			pre = pre + todos.get(0).getDisciplina().getCodigo() + " : ";
+		while (!todos.isEmpty()) {
+			pre.append(todos.get(0).getDisciplina().getCodigo()).append(" : ");
 			listaPreRequisitos.add(todos.remove(0));
 		}
-		linhaSelecionada.getGradeDisciplina().setPreRequisitos(pre);
+		linhaSelecionada.getGradeDisciplina().setPreRequisitos(pre.toString());
 
 
 	}
@@ -755,57 +647,53 @@ public class CadastroGradeController implements Serializable {
 
 		logger.info("Deletando Pré-requisito: " + linhaSelecionadaPreRequisto.getDisciplina().getNome());
 		preRequisitoDAO.remover(linhaSelecionadaPreRequisto);
-		
-		//listaPreRequisitos.remove(linhaSelecionadaPreRequisto);
-		
+
 		listaPreRequisitos.clear();
 
 		carregaPreRequisitos();
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
-		//usuarioController.atualizarPessoaLogada();
-		
+
 	}
 
 	@Transactional
 	public void incluirDisciplinaIra() {
-		GradeDisciplina gradeDiscIra = null;		
+		GradeDisciplina gradeDiscIra = null;
 		boolean achouDisciplinaIra = false;
-		
-		if (disciplinaIra.getCodigo() == null || disciplinaIra.getCodigo().equals("")){
-			
+
+		if (disciplinaIra.getCodigo() == null || disciplinaIra.getCodigo().equals("")) {
+
 			FacesMessage msg = new FacesMessage("Insira uma disciplina para ser ignorada no calculo do IRA!!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
-			
+
 		}
-		
-		for(GradeDisciplina gradeDisciplinaSelecionada : grade.getGrupoGradeDisciplina()){				
-			if (gradeDisciplinaSelecionada.getDisciplina().getCodigo().equals(disciplinaIra.getCodigo()) && gradeDisciplinaSelecionada.getExcluirIra() == true){					
-				achouDisciplinaIra = true;					
+
+		for (GradeDisciplina gradeDisciplinaSelecionada : grade.getGrupoGradeDisciplina()) {
+			if (gradeDisciplinaSelecionada.getDisciplina().getCodigo().equals(disciplinaIra.getCodigo())) {
+				if (Boolean.TRUE.equals(gradeDisciplinaSelecionada.getExcluirIra())) {
+					achouDisciplinaIra = true;
+				} else {
+					gradeDiscIra = gradeDisciplinaSelecionada;
+				}
 			}
-			else if (gradeDisciplinaSelecionada.getDisciplina().getCodigo().equals(disciplinaIra.getCodigo()) && gradeDisciplinaSelecionada.getExcluirIra() == false){					
-				gradeDiscIra = gradeDisciplinaSelecionada;		
+		}
 
-			}			
-		}		
-
-		
-		
-		if (achouDisciplinaIra == true){
+		if (achouDisciplinaIra) {
 			FacesMessage msg = new FacesMessage("Esta Disciplina já foi incluída!!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
 		}
-		gradeDiscIra.setExcluirIra(true);
-		gradeDisciplinaDAO.persistir(gradeDiscIra);
-		listaIra.add(gradeDiscIra);
-		disciplinaIra = new Disciplina();
-		lgDisciplinaIra = false;
-		estruturaArvore.removerEstrutura(grade);
-		usuarioController.setReseta(true);
-		//usuarioController.atualizarPessoaLogada();
-		
+
+		if (gradeDiscIra != null) {
+			gradeDiscIra.setExcluirIra(true);
+			gradeDisciplinaDAO.persistir(gradeDiscIra);
+			listaIra.add(gradeDiscIra);
+			disciplinaIra = new Disciplina();
+			lgDisciplinaIra = false;
+			estruturaArvore.removerEstrutura(grade);
+			usuarioController.setReseta(true);
+		}
 	}
 
 	@Transactional
@@ -819,13 +707,10 @@ public class CadastroGradeController implements Serializable {
 		
 		if (disciplinaEquivalenciaUm.getCodigo() == null || disciplinaEquivalenciaUm.getCodigo().equals("") || disciplinaEquivalenciaDois.getCodigo() == null || disciplinaEquivalenciaDois.getCodigo().equals("")){
 			FacesMessage msg = new FacesMessage("Complete os dados da equivalência!!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			return;
-			
-			
 		}
-		
-		
+
 		for (Equivalencia equivalenciaQuestao : grade.getGrupoEquivalencia()){
 			if (equivalenciaQuestao.getDisciplinaEquivalente().getCodigo().equals( disciplinaEquivalenciaUm.getCodigo())  && equivalenciaQuestao.getDisciplinaGrade().getCodigo().equals(disciplinaEquivalenciaDois.getCodigo())){
 				equivalenciaAuxiliar = equivalenciaQuestao;
@@ -835,7 +720,7 @@ public class CadastroGradeController implements Serializable {
 				
 		if (equivalenciaAuxiliar != null){
 			FacesMessage msg = new FacesMessage("Equivalncia já existe!!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			disciplinaEquivalenciaUm = new Disciplina();
 			disciplinaEquivalenciaDois = new Disciplina();
 			lgCodigoDisciplinaEquivalenciaDois = false;
@@ -847,7 +732,7 @@ public class CadastroGradeController implements Serializable {
 
 		if(disciplinaEquivalenciaDois.getCodigo().equals(disciplinaEquivalenciaUm.getCodigo()) ){
 			FacesMessage msg = new FacesMessage("Não possível incluir equivalência da própria disciplina!!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
+			facesContext.addMessage(null, msg);
 			disciplinaEquivalenciaUm = new Disciplina();
 			disciplinaEquivalenciaDois = new Disciplina();
 			lgCodigoDisciplinaEquivalenciaDois = false;
@@ -868,9 +753,6 @@ public class CadastroGradeController implements Serializable {
 		lgNomeDisciplinaEquivalenciaUm = false;	
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
-		//usuarioController.atualizarPessoaLogada();
-		
-
 	}
 
 	public void limpaDisciplinaIra(){
@@ -879,7 +761,6 @@ public class CadastroGradeController implements Serializable {
 	}
 
 	public void limpaEquivalencia(){
-
 		disciplinaEquivalenciaUm = new Disciplina();
 		disciplinaEquivalenciaDois = new Disciplina();
 		lgCodigoDisciplinaEquivalenciaDois = false;
@@ -895,8 +776,7 @@ public class CadastroGradeController implements Serializable {
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
 		listaEquivalencia.remove(linhaSelecionadaEquivalencia);
-		//usuarioController.atualizarPessoaLogada();
-		
+
 		atualizaGrids();
 	}
 	
@@ -907,15 +787,11 @@ public class CadastroGradeController implements Serializable {
 		gradeDisciplinaDAO.persistir(gradeDisciplinaIraSelecionada);
 		estruturaArvore.removerEstrutura(grade);
 		usuarioController.setReseta(true);
-		//usuarioController.atualizarPessoaLogada();
-		
-		
 	}
 
 	//========================================================= GET - SET ==================================================================================//
 
 	public Grade getGrade() {
-		//System.out.println("TENTA LER");
 		return grade;
 	}
 
@@ -1288,8 +1164,4 @@ public class CadastroGradeController implements Serializable {
 			GradeDisciplina gradeDisciplinaIraSelecionada) {
 		this.gradeDisciplinaIraSelecionada = gradeDisciplinaIraSelecionada;
 	}
-
-
-
-
 }
