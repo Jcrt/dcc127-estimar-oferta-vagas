@@ -35,7 +35,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-//import br.ufjf.coordenacao.sistemagestaocurso.repository.AlunoRepository;
 
 @Named
 @ViewScoped
@@ -54,21 +53,18 @@ public class GraficosController implements Serializable {
 	private int periodoSelecionados;
 	private int quantidadeTotal;
 	private HorizontalBarChartModel animatedModel2;
-	private final GChartType chartType = GChartType.PIE;
+	private static final GChartType chartType = GChartType.PIE;
 	private EstruturaArvore estruturaArvore;
 	private GChartModel chartModel = null;
-	private List<ListaPeriodoAluno> listaDados = new ArrayList<ListaPeriodoAluno>();
-	private List<TotalizadorCurso> listaTotalizada = new ArrayList<TotalizadorCurso>();
-	private List<AlunoSelecionado> listaAlunoSelecionado = new ArrayList<AlunoSelecionado>();
+	private List<ListaPeriodoAluno> listaDados = new ArrayList<>();
+	private List<TotalizadorCurso> listaTotalizada = new ArrayList<>();
+	private List<AlunoSelecionado> listaAlunoSelecionado = new ArrayList<>();
 	private List<AlunoSelecionado> listaAlunoSelecionadoFiltrados;
 	private List<ColumnModel> columns;
 	private boolean semColuna = true;
 
 	private static final Logger logger = Logger.getLogger(GraficosController.class);
 
-	/*@Inject
-	private AlunoRepository alunoDAO ;*/
-	
 	//========================================================= METODOS ==================================================================================//
 
 	public List<ColumnModel> getColumns() {
@@ -87,7 +83,6 @@ public class GraficosController implements Serializable {
 		
 		estruturaArvore = EstruturaArvore.getInstance();
 		usuarioController.atualizarPessoaLogada();
-		//alunoDAO =  estruturaArvore.getAlunoDAO();
 		curso = usuarioController.getAutenticacao().getCursoSelecionado();
 
 		buscarDados();
@@ -121,20 +116,18 @@ public class GraficosController implements Serializable {
 		GChartModelBuilder gChartModelBuilder = new GChartModelBuilder();
 		gChartModelBuilder.setChartType(getChartType()).addColumns("Periodo Incompleto", "Quantidade");
 		listaDados = ordenar.PeriodoAlunoPorIngressoGeral(listaDados);
-		columns = new ArrayList<ColumnModel>();
+		columns = new ArrayList<>();
 		int i;
 		for (i=1;i<=maximoEncontrado;i++){
 			columns.add(new ColumnModel(String.valueOf(i),(i-1)));
 		}
-		
-		if (columns.size() == 0){
-			
+
+		if (columns.isEmpty()) {
 			semColuna = false;
 		}
-		
-		
+
 		columns.add(new ColumnModel("Total",(i-1)));
-		ArrayList<Integer> listaTotalizadosAcumulados = new ArrayList<Integer>(5);
+		ArrayList<Integer> listaTotalizadosAcumulados = new ArrayList<>(5);
 		i = 1;
 		boolean naoEntrouPrimeira = false;
 		while(i != (maximoEncontrado + 1)){
@@ -144,7 +137,7 @@ public class GraficosController implements Serializable {
 			for(ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados) {
 				ordenar.PeriodoAlunoPorPeriodoGeral(listaPeriodoAlunoSelecionado.getListaPeriodo());
 				boolean naoEntrou = false;
-				List<Integer> listaTotalizados = new ArrayList<Integer>();
+				List<Integer> listaTotalizados = new ArrayList<>();
 				int quantidadeAlunos = 0;
 				int contador = 1;
 				for (PeriodoAluno periodoAlunoSelecionado : listaPeriodoAlunoSelecionado.getListaPeriodo()) {
@@ -180,7 +173,7 @@ public class GraficosController implements Serializable {
 					int contTotais = 0;
 					for (Integer inteiro : totalizadorCurso.getListaTotalizados()){
 						int soma;
-						if (listaTotalizadosAcumulados.size() == 0 || listaTotalizadosAcumulados.size() == contTotais) {
+						if (listaTotalizadosAcumulados.isEmpty() || listaTotalizadosAcumulados.size() == contTotais) {
 							soma = inteiro;
 							listaTotalizadosAcumulados.add(soma);
 						} else {
@@ -197,7 +190,6 @@ public class GraficosController implements Serializable {
 			}
 			naoEntrouPrimeira = true;
 			
-			//if(i != curso.gr)
 			gChartModelBuilder.addRow(i + "° - Período Incompleto", contadorAluno);
 			model.addSeries(f);
 			i++;
@@ -217,12 +209,8 @@ public class GraficosController implements Serializable {
 
 			if (!gradeSelecionado.estaCompleta()) continue;
 
-			//List<Aluno> listaAlunos = alunoDAO.buscarTodosAlunoCursoGradeObjeto(curso.getId(), gradeSelecionado.getId());
-			
 			List<Aluno> listaAlunos = gradeSelecionado.getGrupoAlunos();
-			
-			
-			
+
 			importador = estruturaArvore.recuperarArvore(gradeSelecionado,true);
 			for (Aluno alunoSelecionado : listaAlunos){
 				curriculum = importador.get_cur();
@@ -239,8 +227,8 @@ public class GraficosController implements Serializable {
 				
 				
 				alunoSelecionado.setPeriodoReal(gerarDadosAluno(st,curriculum));
-				ListaPeriodoAluno listaPeriodoAlunoManipulada = buscarListaIngresso(alunoSelecionado.getPeriodoIngresso(),gradeSelecionado); // lista global
-				int periodoRealNovo = gerarDadosAluno(st,curriculum);
+				ListaPeriodoAluno listaPeriodoAlunoManipulada = buscarListaIngresso(alunoSelecionado.getPeriodoIngresso()); // lista global
+				int periodoRealNovo = gerarDadosAluno(st, curriculum);
 				if (periodoRealNovo > maximoEncontrado)  maximoEncontrado = periodoRealNovo;
 				if (listaPeriodoAlunoManipulada.getMaximoEncontrado() == null || listaPeriodoAlunoManipulada.getMaximoEncontrado() < periodoRealNovo ) listaPeriodoAlunoManipulada.setMaximoEncontrado(periodoRealNovo);
 				PeriodoAluno periodoAlunoManipulado = buscarListaPeriodoReal(listaPeriodoAlunoManipulada,periodoRealNovo); //lista por periodo
@@ -249,11 +237,11 @@ public class GraficosController implements Serializable {
 		}
 	}
 
-	public ListaPeriodoAluno buscarListaIngresso(String ingresso,Grade grade ){
-		for (ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados){
-			if (listaPeriodoAlunoSelecionado.getIngressoAlunos().equals(ingresso)){	
-				return listaPeriodoAlunoSelecionado;	
-			}		
+	public ListaPeriodoAluno buscarListaIngresso(String ingresso) {
+		for (ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados) {
+			if (listaPeriodoAlunoSelecionado.getIngressoAlunos().equals(ingresso)) {
+				return listaPeriodoAlunoSelecionado;
+			}
 		}
 		ListaPeriodoAluno listaPeriodoAlunoNova = new ListaPeriodoAluno();
 		listaPeriodoAlunoNova.setIngressoAlunos(ingresso);
@@ -263,7 +251,7 @@ public class GraficosController implements Serializable {
 
 	public PeriodoAluno buscarListaPeriodoReal(ListaPeriodoAluno listaPeriodoAluno,Integer periodoReal) {
 		for (PeriodoAluno periodoAlunoSelecionado : listaPeriodoAluno.getListaPeriodo()) {
-			if (periodoAlunoSelecionado.getPeriodoReal() == periodoReal) {
+			if (periodoAlunoSelecionado.getPeriodoReal().equals(periodoReal)) {
 				return periodoAlunoSelecionado;
 			}
 		}
@@ -275,7 +263,7 @@ public class GraficosController implements Serializable {
 
 	public int gerarDadosAluno(Student st, Curriculum cur)	{
 		HashMap<Class, ArrayList<String[]>> aprovado;
-		aprovado = new HashMap<Class, ArrayList<String[]>>(st.getClasses(ClassStatus.APPROVED)); 
+		aprovado = new HashMap<>(st.getClasses(ClassStatus.APPROVED));
 		for(int i: cur.getMandatories().keySet()){
 			for(Class c: cur.getMandatories().get(i)){
 				if(!aprovado.containsKey(c)) {
@@ -283,14 +271,13 @@ public class GraficosController implements Serializable {
 				}
 			}	
 		}
-		//return cur.getMandatories().keySet().size()+1;
-		
+
 		return cur.getMandatories().keySet().size();
 	}
 
 	public void itemSelect(ItemSelectEvent event) {
 		quantidadeTotal = 0;
-		listaAlunoSelecionado = new ArrayList<AlunoSelecionado>();
+		listaAlunoSelecionado = new ArrayList<>();
 		for (PeriodoAluno periodoAluno : listaDados.get(event.getItemIndex()).getListaPeriodo()) {
 			quantidadeTotal = quantidadeTotal + periodoAluno.getListaAlunosPeriodo().size();
 			if (periodoAluno.getPeriodoReal() == (event.getSeriesIndex() + 1)) {
@@ -317,7 +304,7 @@ public class GraficosController implements Serializable {
 			String label = new ArrayList<GChartModelRow>(this.getChart().getRows()).get(element.getAsJsonObject().get("row").getAsInt()).getLabel();
 			selecionado = Integer.valueOf(label.substring(0,1));
 		}
-		listaAlunoSelecionado = new ArrayList<AlunoSelecionado>();
+		listaAlunoSelecionado = new ArrayList<>();
 		for(ListaPeriodoAluno listaPeriodoAlunoSelecionado : listaDados) {
 			for (PeriodoAluno periodoAluno : listaPeriodoAlunoSelecionado.getListaPeriodo()) {
 				if (periodoAluno.getPeriodoReal() == (selecionado)) {
@@ -326,13 +313,6 @@ public class GraficosController implements Serializable {
 						alunoSelecionado.setGradeIngresso((listaPeriodoAlunoSelecionado.getIngressoAlunos()));
 						alunoSelecionado.setMatricula(alunoQuestao.getMatricula());
 						alunoSelecionado.setNomeAluno(alunoQuestao.getNome());
-						/*String periodo;
-						if (alunoQuestao.getGrade().getPeriodoInicio() == 0){
-							periodo = alunoQuestao.getMatricula().substring(0,4)   + "3";
-						}
-						else {
-							periodo = alunoQuestao.getMatricula().substring(0,4)  + String.valueOf(alunoQuestao.getGrade().getPeriodoInicio());
-						}*/
 						alunoSelecionado.setPeriodoCorrente( alunoQuestao.getPeriodoCorrente(usuarioController.getAutenticacao().getSemestreSelecionado()));
 						listaAlunoSelecionado.add(alunoSelecionado);
 					}
@@ -350,7 +330,7 @@ public class GraficosController implements Serializable {
 		}
 	}
 
-	static public class ColumnModel implements Serializable {
+	public static class ColumnModel implements Serializable {
 		private static final long serialVersionUID = 1L;
 		private final String header;
 		private final int mes;
