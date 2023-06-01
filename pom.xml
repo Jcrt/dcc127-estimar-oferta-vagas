@@ -237,13 +237,9 @@
 			<version>3.3.2</version>
 		</dependency>
 		<dependency>
-			<groupId>estimar-oferta-vagas</groupId>
+			<groupId>com.ufjf</groupId>
 			<artifactId>estimar-oferta-vagas-2019</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>
-				${project.basedir}/libs/estimar-oferta-vagas/estimar-oferta-vagas-2019/1.0.0/estimar-oferta-vagas-2019-1.0.0.jar
-			</systemPath>
+			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugins</groupId>
