@@ -1,10 +1,17 @@
 package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
-import java.io.Serializable;
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import br.ufjf.coordenacao.OfertaVagas.model.Class;
+import br.ufjf.coordenacao.OfertaVagas.model.Curriculum;
+import br.ufjf.coordenacao.OfertaVagas.model.Student;
+import br.ufjf.coordenacao.OfertaVagas.model.StudentsHistory;
+import br.ufjf.coordenacao.OfertaVagas.report.StudentCoursePlan;
+import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
+import br.ufjf.coordenacao.sistemagestaocurso.model.*;
+import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.DisciplinaPlanejamento;
+import br.ufjf.coordenacao.sistemagestaocurso.repository.*;
+import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
+import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
+import org.apache.log4j.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -12,59 +19,42 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.apache.log4j.Logger;
-
-import br.ufjf.coordenacao.OfertaVagas.model.Curriculum;
-import br.ufjf.coordenacao.OfertaVagas.model.Student;
-import br.ufjf.coordenacao.OfertaVagas.model.StudentsHistory;
-import br.ufjf.coordenacao.OfertaVagas.report.StudentCoursePlan;
-import br.ufjf.coordenacao.OfertaVagas.model.Class;
-import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Equivalencia;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
-import br.ufjf.coordenacao.sistemagestaocurso.model.GradeDisciplina;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Historico;
-import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.DisciplinaPlanejamento;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.AlunoRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.EquivalenciaRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.EventoAceRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.repository.GradeDisciplinaRepository;
-import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
-import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
+import java.io.Serializable;
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 @Named
 @ViewScoped
 public class PlanejamentoFormaturaController implements Serializable {
-	//TODO Refatorar essa classe!!!!!! *_*
-	//========================================================= VARIABLES ==================================================================================//
-
 	private static final long serialVersionUID = 1L;
+	private static final String MATRICULADO = "Matriculado";
+	private static final String OPCIONAL = "OPCIONAL";
+	private static final String ELETIVA = "ELETIVA";
+	private static final String ORANGE = "orange";
+	private static final String BLACK = "black";
 	private static final Logger logger = Logger.getLogger(PlanejamentoFormaturaController.class);
-	
+
 	private boolean lgMatriculaAluno = false;
-	private boolean lgNomeAluno  = false;
-	private boolean lgSelecionado  = false;	
-	private boolean lgCampoHrsPeriodo  = true;	
-	private boolean matriculados  = true;	
+	private boolean lgNomeAluno = false;
+	private boolean lgSelecionado = false;
+	private boolean lgCampoHrsPeriodo = true;
+	private boolean matriculados = true;
 	private Aluno aluno = new Aluno();
 	private DisciplinaPlanejamento disciplinaSelecionada = new DisciplinaPlanejamento();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadas = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasDois = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasTres = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasQuatro = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasCinco = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasSeis = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasSete = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasOito = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasNove = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasDez = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasOnze = new ArrayList<DisciplinaPlanejamento>();
-	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasDoze = new ArrayList<DisciplinaPlanejamento>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadas = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasDois = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasTres = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasQuatro = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasCinco = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasSeis = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasSete = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasOito = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasNove = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasDez = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasOnze = new ArrayList<>();
+	private List<DisciplinaPlanejamento> listaDisciplinaSelecionadasDoze = new ArrayList<>();
 	private boolean lgTabelaUm = false;
 	private boolean lgTabelaDois = false;
 	private boolean lgTabelaTres = false;
@@ -80,7 +70,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 	
 	private boolean lgAluno = true;
 	private boolean periodoDesejado;
-	private List< String > listaCargaHorariaPeriodo = new ArrayList<String>();
+	private List<String> listaCargaHorariaPeriodo = new ArrayList<>();
 	private int horasEletivasConcluidas;
 	private int horasOpcionaisConcluidas;
 	private int horasObrigatoriasConcluidas;
@@ -111,7 +101,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 	@Inject
 	private EquivalenciaRepository equivalenciaRepository;
 	
-	private int[] horasPeriodo = new int[12];
+	private final int[] horasPeriodo = new int[12];
 
 
 
@@ -158,15 +148,16 @@ public class PlanejamentoFormaturaController implements Serializable {
 		}
 		else{
 			curso = usuarioController.getAutenticacao().getCursoSelecionado();
-			if (curso.getGrupoAlunos().size() == 0){
-
+			if (curso.getGrupoAlunos().isEmpty()) {
 				FacesMessage msg = new FacesMessage("Nenhum aluno cadastrado no curso!");
 				FacesContext.getCurrentInstance().addMessage(null, msg);
 			}
 		}
 		} catch (Exception e) {
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Ocorreu um problema", e.getLocalizedMessage()));
-			logger.error("Erro ao gerar o planejamento para " + aluno.getMatricula(), e);
+
+			if (aluno != null)
+				logger.error("Erro ao gerar o planejamento para " + aluno.getMatricula(), e);
 		}
 
 
@@ -191,49 +182,48 @@ public class PlanejamentoFormaturaController implements Serializable {
 	public String corDisciplina(int periodoDisciplina,int periodoInclusao, String codigoDisciplina){
 		periodoDisciplina = periodoDisciplina % 2;
 		periodoInclusao = periodoInclusao % 2;
-		
-		for(Historico h : this.aluno.getGrupoHistorico("Matriculado")) {
-			if(codigoDisciplina.equals(h.getDisciplina().getCodigo()))
+
+		for (Historico h : this.aluno.getGrupoHistorico(MATRICULADO)) {
+			if (codigoDisciplina.equals(h.getDisciplina().getCodigo()))
 				return "blue";
 		}
 		if ( periodoInclusao ==  0 && periodoDisciplina == 1 && aluno.getGrade().getPeriodoInicio() == 3 && periodoInicio == 3){
-			return "black";
+			return BLACK;
 		}
 		else if ( periodoInclusao == 1 &&  periodoDisciplina == 1 && aluno.getGrade().getPeriodoInicio() == 3 && periodoInicio == 1){
-			return "black";
+			return BLACK;
 		}
 		else if ( periodoInclusao == 0 &&  periodoDisciplina == 0 && aluno.getGrade().getPeriodoInicio() == 3 && periodoInicio == 1){
-			return "black";
+			return BLACK;
 		}
 		else if ( periodoInclusao == 1 &&  periodoDisciplina == 0 && aluno.getGrade().getPeriodoInicio() == 3 && periodoInicio == 3){
-			return "black";
+			return BLACK;
 		}
 		else if(aluno.getGrade().getPeriodoInicio() == 3){
-			return "orange";
+			return ORANGE;
 		}
 		if ( periodoInclusao ==  0 && periodoDisciplina == 0 && aluno.getGrade().getPeriodoInicio() == 1 && periodoInicio == 3){
-			return "black";
+			return BLACK;
 		}
 		else if ( periodoInclusao == 1 &&  periodoDisciplina == 1 && aluno.getGrade().getPeriodoInicio() == 1 && periodoInicio == 3){
-			return "black";
+			return BLACK;
 		}
 		else if ( periodoInclusao == 0 &&  periodoDisciplina == 1 && aluno.getGrade().getPeriodoInicio() == 1 && periodoInicio == 1){
-			return "black";
+			return BLACK;
 		}
 		else if ( periodoInclusao == 1 &&  periodoDisciplina == 0 && aluno.getGrade().getPeriodoInicio() == 1 && periodoInicio == 1){
-			return "black";
+			return BLACK;
 		}
 		else if(aluno.getGrade().getPeriodoInicio() == 1){
-			return "orange";
+			return ORANGE;
 		}
 		return null;
 	}
 
-	public String bordaPeriodo(int variavel){
-		if (aluno.getGrade().getCodigo() != null){
-			if (periodo + variavel > aluno.getGrade().getNumeroMaximoPeriodos()){
-				return "border-style: solid; border-color: red;";
-			}
+	public String bordaPeriodo(int variavel) {
+		if (aluno.getGrade().getCodigo() != null
+				&& (periodo + variavel > aluno.getGrade().getNumeroMaximoPeriodos())) {
+			return "border-style: solid; border-color: red;";
 		}
 		return "";
 	}
@@ -270,7 +260,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 		int ano = now.get(Calendar.YEAR);
 		int mes = now.get(Calendar.MONTH) + 1;
 		int i;
-		String periodo = "";
+		String periodoEmQuestao = "";
 		if(mes > 6){
 			if (periodoInicio != 3){
 				numero = numero + 1;
@@ -283,10 +273,10 @@ public class PlanejamentoFormaturaController implements Serializable {
 		}
 		for (i=0;i<numero;i++){
 			if(mes >= 1 && mes <= 6){
-				periodo = "1 - " + ano;
+				periodoEmQuestao = "1 - " + ano;
 			}
 			else {
-				periodo = "3 - " + ano;
+				periodoEmQuestao = "3 - " + ano;
 				ano++;
 			}
 			mes = mes + 6;
@@ -294,7 +284,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 				mes = mes - 12;
 			}
 		}
-		return periodo;
+		return periodoEmQuestao;
 	}
 
 	public boolean moverDireita(int posicao,DisciplinaPlanejamento disciplinaSelecionadaIntera ){
@@ -303,16 +293,16 @@ public class PlanejamentoFormaturaController implements Serializable {
 		}
 		boolean funcionou = true;
 		String cor = "";
-		if (!disciplinaSelecionadaIntera.getCodigo().equals("ELETIVA") && !disciplinaSelecionadaIntera.getCodigo().equals("OPCIONAL")){
-			for(int i: curriculumAluno.getMandatories().keySet()){
-				for(Class c: curriculumAluno.getMandatories().get(i)){
-					for(Class cl: c.getCorequisite()){
-						if(cl.getId().equals(disciplinaSelecionadaIntera.getCodigo())){
+		if (!disciplinaSelecionadaIntera.getCodigo().equals(ELETIVA) && !disciplinaSelecionadaIntera.getCodigo().equals(OPCIONAL)) {
+			for (int i : curriculumAluno.getMandatories().keySet()) {
+				for (Class c : curriculumAluno.getMandatories().get(i)) {
+					for (Class cl : c.getCorequisite()) {
+						if (cl.getId().equals(disciplinaSelecionadaIntera.getCodigo())) {
 							DisciplinaPlanejamento preRequisitoPlanejamento = new DisciplinaPlanejamento();
 							preRequisitoPlanejamento.setCodigo(c.getId());
 							preRequisitoPlanejamento.setCargaHoraria(c.getWorkload());
-							for(DisciplinaPlanejamento disciplinaPrincipal :recuperarLista(posicao) ){
-								if (disciplinaPrincipal.getCodigo().equals( preRequisitoPlanejamento.getCodigo())){
+							for (DisciplinaPlanejamento disciplinaPrincipal : recuperarLista(posicao)) {
+								if (disciplinaPrincipal.getCodigo().equals(preRequisitoPlanejamento.getCodigo())) {
 									recuperarLista(posicao).remove(disciplinaSelecionadaIntera);
 									funcionou = moverDireita (posicao,disciplinaPrincipal);
 									break;
@@ -325,38 +315,36 @@ public class PlanejamentoFormaturaController implements Serializable {
 							DisciplinaPlanejamento preRequisitoPlanejamento = new DisciplinaPlanejamento();
 							preRequisitoPlanejamento.setCodigo(c.getId());
 							preRequisitoPlanejamento.setCargaHoraria(c.getWorkload());
-							if (posicao < 12 ){
-								for(DisciplinaPlanejamento disciplinaPrincipal :recuperarLista(posicao + 1) ){
-									if (disciplinaPrincipal.getCodigo().equals(preRequisitoPlanejamento.getCodigo())){
-										funcionou = moverDireita (posicao + 1,disciplinaPrincipal);
+							if (posicao < 12) {
+								for (DisciplinaPlanejamento disciplinaPrincipal : recuperarLista(posicao + 1)) {
+									if (disciplinaPrincipal.getCodigo().equals(preRequisitoPlanejamento.getCodigo())) {
+										funcionou = moverDireita(posicao + 1, disciplinaPrincipal);
 										break;
 									}
 								}
 							}
 						}
 					}
-					if (funcionou == true){
-						if (disciplinaSelecionadaIntera.getCor().equals("black")){
-							cor = "orange"; 
-						}
-						else {
-							cor = "black"; 
+					if (funcionou) {
+						if (disciplinaSelecionadaIntera.getCor().equals(BLACK)) {
+							cor = ORANGE;
+						} else {
+							cor = BLACK;
 						}
 					}
 				}
 			}
 		}
-		if (recuperarLista(posicao + 1) == null){
-			FacesMessage msg = new FacesMessage("Não é possível realizar esta ação, verifique os requisitos desta disciplina!");	
+		if (recuperarLista(posicao + 1) == null) {
+			FacesMessage msg = new FacesMessage("Não é possível realizar esta ação, verifique os requisitos desta disciplina!");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 			return false;
 		}
-		if (funcionou == false){
+		if (!funcionou) {
 			return false;
-		}
-		if (funcionou == true){
+		} else {
 			recuperarLista(posicao).remove(disciplinaSelecionadaIntera);
-			if (recuperarLista(posicao + 1).size() == 0){
+			if (recuperarLista(posicao + 1).isEmpty()) {
 				recuperarLg(posicao + 1, true);
 			}
 			disciplinaSelecionadaIntera.setCor(cor);
@@ -371,57 +359,54 @@ public class PlanejamentoFormaturaController implements Serializable {
 		}
 		boolean funcionou = true;
 		String cor = "";
-		if (!disciplinaSelecionadaIntera.getCodigo().equals("ELETIVA") && !disciplinaSelecionadaIntera.getCodigo().equals("OPCIONAL")){
-			for(int i: curriculumAluno.getMandatories().keySet()){
-				for(Class c: curriculumAluno.getMandatories().get(i)) {	
-					if (c.getId().equals(disciplinaSelecionadaIntera.getCodigo())){
-						for(Class cl: c.getCorequisite()){
-							for(DisciplinaPlanejamento disciplinaPrincipal :recuperarLista(posicao) ){
-								if (disciplinaPrincipal.getCodigo().equals( cl.getId())){
+		if (!disciplinaSelecionadaIntera.getCodigo().equals(ELETIVA) && !disciplinaSelecionadaIntera.getCodigo().equals(OPCIONAL)) {
+			for (int i : curriculumAluno.getMandatories().keySet()) {
+				for (Class c : curriculumAluno.getMandatories().get(i)) {
+					if (c.getId().equals(disciplinaSelecionadaIntera.getCodigo())) {
+						for (Class cl : c.getCorequisite()) {
+							for (DisciplinaPlanejamento disciplinaPrincipal : recuperarLista(posicao)) {
+								if (disciplinaPrincipal.getCodigo().equals(cl.getId())) {
 									recuperarLista(posicao).remove(disciplinaSelecionadaIntera);
-									funcionou = moverEsquerda (posicao,disciplinaPrincipal);
+									funcionou = moverEsquerda(posicao, disciplinaPrincipal);
 									break;
 								}
 							}
 						}
 						for(Class cl: c.getPrerequisite()){
-							if (posicao > 1 ){
-								for(DisciplinaPlanejamento disciplinaPrincipal :recuperarLista(posicao - 1)  ){
-									if (disciplinaPrincipal.getCodigo().equals(cl.getId())){
-										funcionou = moverEsquerda (posicao - 1,disciplinaPrincipal);
+							if (posicao > 1) {
+								for (DisciplinaPlanejamento disciplinaPrincipal : recuperarLista(posicao - 1)) {
+									if (disciplinaPrincipal.getCodigo().equals(cl.getId())) {
+										funcionou = moverEsquerda(posicao - 1, disciplinaPrincipal);
 										break;
 									}
 								}
 							}
 						}
 					}
-					if (disciplinaSelecionadaIntera.getCor().equals("black")){
-						cor = "orange"; 
-					}
-					else {
-						cor = "black"; 
+					if (disciplinaSelecionadaIntera.getCor().equals(BLACK)) {
+						cor = ORANGE;
+					} else {
+						cor = BLACK;
 					}
 				}
 			}
 		}
-		if (recuperarLista(posicao - 1) == null || recuperarLista(posicao) == null){
+		if (recuperarLista(posicao - 1) == null || recuperarLista(posicao) == null) {
 			FacesMessage msg = new FacesMessage("Não é possível realizar esta ação, verifique os requisitos desta disciplina!");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 			return false;
 		}
-		if (funcionou == false){
+		if (!funcionou) {
 			return false;
-		}
-		if (funcionou == true){
+		} else {
 			recuperarLista(posicao).remove(disciplinaSelecionadaIntera);
 			disciplinaSelecionadaIntera.setCor(cor);
 			recuperarLista(posicao - 1).add(disciplinaSelecionadaIntera);
 			recuperarLg(posicao - 1, true);
-			for(int x = 12; x >= posicao; x-- ){
-				if (recuperarLista(x).size() == 0){
+			for (int x = 12; x >= posicao; x--) {
+				if (recuperarLista(x).isEmpty()) {
 					recuperarLg(x, false);
-				}
-				else {
+				} else {
 					break;
 				}
 			}
@@ -431,7 +416,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 
 	public List<String> alunoMatricula(String codigo) {		
 		codigo = codigo.toUpperCase();
-		List<String> todos = new ArrayList<String>();
+		List<String> todos = new ArrayList<>();
 		for (Aluno alunoQuestao : curso.getGrupoAlunos()){
 			if(alunoQuestao.getMatricula().contains(codigo)){
 				todos.add(alunoQuestao.getMatricula()); 
@@ -442,7 +427,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 
 	public List<Aluno> alunoNome(String codigo) {		
 		codigo = codigo.toUpperCase();
-		List<Aluno> todos = new ArrayList<Aluno>();
+		List<Aluno> todos = new ArrayList<>();
 		for (Aluno alunoQuestao : curso.getGrupoAlunos()){
 
 			//Desconsiderando acentuação
@@ -466,10 +451,10 @@ public class PlanejamentoFormaturaController implements Serializable {
 		aluno.setEventoAceRepository(eventoAceRepository);
 		
 		lgMatriculaAluno = true;
-		lgNomeAluno = true;	
+		lgNomeAluno = true;
 		lgCampoHrsPeriodo = false;
-		listaCargaHorariaPeriodo = new ArrayList<String>();
-		importador = estruturaArvore.recuperarArvore(aluno.getGrade(),true);
+		listaCargaHorariaPeriodo = new ArrayList<>();
+		importador = estruturaArvore.recuperarArvore(aluno.getGrade(), true);
 		StudentsHistory sh = importador.getSh();
 		st = sh.getStudents().get(aluno.getMatricula());
 
@@ -497,12 +482,6 @@ public class PlanejamentoFormaturaController implements Serializable {
 		importador.considerarCo();
 		curriculum = importador.get_cur();		
 
-		/*if (!aluno.getGrade().estaCompleta()) {
-			FacesMessage msg = new FacesMessage("Grade Incompleta verifique o menu Cadastros > Grade!");
-			FacesContext.getCurrentInstance().addMessage(null, msg);
-			return;
-		}*/
-		
 		gerarExpectativa();
 	}
 
@@ -510,16 +489,12 @@ public class PlanejamentoFormaturaController implements Serializable {
 	{
 		for(Historico h: this.aluno.getGrupoHistorico())
 		{
-			if(h.getStatusDisciplina().equals("Matriculado"))
-			{
-				GradeDisciplina gradeDisciplina  = gradeDisciplinas.buscarPorDisciplinaGrade(aluno.getGrade().getId(), h.getDisciplina().getId());
-				if(gradeDisciplina != null)
-				{
-					if(gradeDisciplina.getTipoDisciplina().equals("Eletiva"))
+			if (h.getStatusDisciplina().equals(MATRICULADO)) {
+				GradeDisciplina gradeDisciplina = gradeDisciplinas.buscarPorDisciplinaGrade(aluno.getGrade().getId(), h.getDisciplina().getId());
+				if (gradeDisciplina != null) {
+					if (gradeDisciplina.getTipoDisciplina().equals(ELETIVA))
 						horasFaltamEletivas -= h.getDisciplina().getCargaHoraria();
-				}
-				else
-				{
+				} else {
 					if (!equivalenciaRepository.existeDisciplinaEquivalente(h.getDisciplina().getId(), aluno.getGrade().getId()))
 						horasFaltamOpcionais -= h.getDisciplina().getCargaHoraria();
 				}
@@ -539,24 +514,24 @@ public class PlanejamentoFormaturaController implements Serializable {
 		}
 
 
-		if(qtdHorasPeriodo < 60){
+		if (qtdHorasPeriodo < 60) {
 			FacesMessage msg = new FacesMessage("A quantidade de horas por período deve ser maior que 60h!");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 			return;
 		}
-		
-		listaDisciplinaSelecionadas = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasDois = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasTres = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasQuatro = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasCinco = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasSeis = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasSete = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasOito = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasNove = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasDez = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasOnze = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasDoze = new ArrayList<DisciplinaPlanejamento>();
+
+		listaDisciplinaSelecionadas = new ArrayList<>();
+		listaDisciplinaSelecionadasDois = new ArrayList<>();
+		listaDisciplinaSelecionadasTres = new ArrayList<>();
+		listaDisciplinaSelecionadasQuatro = new ArrayList<>();
+		listaDisciplinaSelecionadasCinco = new ArrayList<>();
+		listaDisciplinaSelecionadasSeis = new ArrayList<>();
+		listaDisciplinaSelecionadasSete = new ArrayList<>();
+		listaDisciplinaSelecionadasOito = new ArrayList<>();
+		listaDisciplinaSelecionadasNove = new ArrayList<>();
+		listaDisciplinaSelecionadasDez = new ArrayList<>();
+		listaDisciplinaSelecionadasOnze = new ArrayList<>();
+		listaDisciplinaSelecionadasDoze = new ArrayList<>();
 		lgTabelaUm = false;
 		lgTabelaDois = false;
 		lgTabelaTres = false;
@@ -625,14 +600,14 @@ public class PlanejamentoFormaturaController implements Serializable {
 				
 				GradeDisciplina gradeDisciplina  = gradeDisciplinas.buscarPorDisciplinaGrade(aluno.getGrade().getId(), disciplina.getId());
 
-				int  periodo = 0;
+				int periodoEmQuestao = 0;
 				if (gradeDisciplina != null){
-					periodo = (int) (long) gradeDisciplina.getPeriodo();
+					periodoEmQuestao = (int) (long) gradeDisciplina.getPeriodo();
 					
 					for(Equivalencia equivalencia : equivalencias)
 					{
 						if (equivalencia.getDisciplinaGrade().getCodigo().equals(disciplina.getCodigo())) {
-							for (Historico historico : aluno.getGrupoHistorico("Matriculado")) {
+							for (Historico historico : aluno.getGrupoHistorico(MATRICULADO)) {
 								if (historico.getDisciplina().getCodigo().equals(equivalencia.getDisciplinaEquivalente().getCodigo())) {
 									disciplinaPlanejamento.setCodigo(equivalencia.getDisciplinaEquivalente().getCodigo());
 									break;
@@ -640,11 +615,11 @@ public class PlanejamentoFormaturaController implements Serializable {
 							}
 						}
 					}
-					
-					disciplinaPlanejamento.setCor(corDisciplina(periodo, i, disciplinaPlanejamento.getCodigo()));
+
+					disciplinaPlanejamento.setCor(corDisciplina(periodoEmQuestao, i, disciplinaPlanejamento.getCodigo()));
 				}
 				else {
-					disciplinaPlanejamento.setCor("black");
+					disciplinaPlanejamento.setCor(BLACK);
 				}
 				
 				recuperarLista(i+1).add(disciplinaPlanejamento);
@@ -660,7 +635,6 @@ public class PlanejamentoFormaturaController implements Serializable {
 		
 		if (ultimoPeriodoPreenchido == 0){
 			ultimoPeriodoPreenchido = -1;
-			
 		}
 		
 		if(this.listaDisciplinaSelecionadas.isEmpty() && this.listaDisciplinaSelecionadasDois.isEmpty()
@@ -681,7 +655,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 	}
 
 	public String cargaHorariaPeriodo(int periodo){
-		if (listaCargaHorariaPeriodo.size() == 0) {
+		if (listaCargaHorariaPeriodo.isEmpty()) {
 			return "";
 		}
 		return listaCargaHorariaPeriodo.get(periodo);
@@ -689,7 +663,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 
 	public void completarEletivasObrigatorias(List<DisciplinaPlanejamento> lista, int numeroLista)
 	{
-		
+		throw new UnsupportedOperationException();
 	}
 	
 	public void gerarEletivasObrigatorias (List<DisciplinaPlanejamento> listaDisciplinas,int numeroLista){
@@ -699,7 +673,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 				if (horasFaltamEletivas >= 60 && (qtdHorasPeriodo - horasPeriodo[numeroLista-1])>= 60){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
 					disciplinaPlanejamento.setCargaHoraria(60);
-					disciplinaPlanejamento.setCodigo("ELETIVA" );
+					disciplinaPlanejamento.setCodigo(ELETIVA);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamEletivas = horasFaltamEletivas - 60;
@@ -708,7 +682,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 				else if (horasFaltamOpcionais >= 60 && (qtdHorasPeriodo - horasPeriodo[numeroLista-1]) >= 60){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
 					disciplinaPlanejamento.setCargaHoraria(60);
-					disciplinaPlanejamento.setCodigo("OPCIONAL" );
+					disciplinaPlanejamento.setCodigo(OPCIONAL);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamOpcionais = horasFaltamOpcionais - 60;
@@ -717,7 +691,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 				else if (horasFaltamEletivas >= 30 && (qtdHorasPeriodo - horasPeriodo[numeroLista-1]) >= 30){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
 					disciplinaPlanejamento.setCargaHoraria(30);
-					disciplinaPlanejamento.setCodigo("ELETIVA");
+					disciplinaPlanejamento.setCodigo(ELETIVA);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamEletivas = horasFaltamEletivas - 30;
@@ -726,7 +700,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 				else if (horasFaltamOpcionais >= 30 && (qtdHorasPeriodo - horasPeriodo[numeroLista-1]) >= 30){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
 					disciplinaPlanejamento.setCargaHoraria(30);
-					disciplinaPlanejamento.setCodigo("OPCIONAL");
+					disciplinaPlanejamento.setCodigo(OPCIONAL);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamOpcionais = horasFaltamOpcionais - 30;
@@ -735,7 +709,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 				else  if (horasFaltamEletivas > 0 && (qtdHorasPeriodo - horasPeriodo[numeroLista-1]) >= horasFaltamEletivas){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
 					disciplinaPlanejamento.setCargaHoraria(horasFaltamEletivas);
-					disciplinaPlanejamento.setCodigo("ELETIVA");
+					disciplinaPlanejamento.setCodigo(ELETIVA);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamEletivas = 0;
@@ -744,7 +718,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 				else if (horasFaltamOpcionais > 0 && (qtdHorasPeriodo - horasPeriodo[numeroLista-1]) >= horasFaltamOpcionais){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
 					disciplinaPlanejamento.setCargaHoraria(horasFaltamOpcionais);
-					disciplinaPlanejamento.setCodigo("OPCIONAL");
+					disciplinaPlanejamento.setCodigo(OPCIONAL);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamOpcionais = 0;
@@ -752,8 +726,8 @@ public class PlanejamentoFormaturaController implements Serializable {
 				}
 				else if((qtdHorasPeriodo - horasPeriodo[numeroLista-1]) < horasFaltamOpcionais){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
-					disciplinaPlanejamento.setCargaHoraria((qtdHorasPeriodo - horasPeriodo[numeroLista-1]));
-					disciplinaPlanejamento.setCodigo("OPCIONAL");
+					disciplinaPlanejamento.setCargaHoraria((qtdHorasPeriodo - horasPeriodo[numeroLista - 1]));
+					disciplinaPlanejamento.setCodigo(OPCIONAL);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamOpcionais = horasFaltamOpcionais - (qtdHorasPeriodo - horasPeriodo[numeroLista-1]);
@@ -761,8 +735,8 @@ public class PlanejamentoFormaturaController implements Serializable {
 				}
 				else if((qtdHorasPeriodo - horasPeriodo[numeroLista-1]) < horasFaltamEletivas){
 					DisciplinaPlanejamento disciplinaPlanejamento = new DisciplinaPlanejamento();
-					disciplinaPlanejamento.setCargaHoraria((qtdHorasPeriodo - horasPeriodo[numeroLista-1]));
-					disciplinaPlanejamento.setCodigo("ELETIVA");
+					disciplinaPlanejamento.setCargaHoraria((qtdHorasPeriodo - horasPeriodo[numeroLista - 1]));
+					disciplinaPlanejamento.setCodigo(ELETIVA);
 					listaDisciplinas.add(disciplinaPlanejamento);
 					recuperarLg(numeroLista, true);
 					horasFaltamEletivas = horasFaltamEletivas - (qtdHorasPeriodo - horasPeriodo[numeroLista-1]);
@@ -796,9 +770,7 @@ public class PlanejamentoFormaturaController implements Serializable {
 		if(i== 10) return listaDisciplinaSelecionadasDez;
 		if(i== 11) return listaDisciplinaSelecionadasOnze;
 		if(i== 12) return listaDisciplinaSelecionadasDoze;
-		return null;//*/
-		//--i;
-		//return ((i>0) && itensPlanejamento.get(i) != null ? itensPlanejamento.get(i).getListaDisciplinaSelecionadas() : null);
+		return null;
 	}
 
 	public void recuperarLg(int i,boolean valor){
@@ -812,36 +784,33 @@ public class PlanejamentoFormaturaController implements Serializable {
 		if(i== 8)  lgTabelaOito = valor;
 		if(i== 9)  lgTabelaNove = valor;
 		if(i== 10)  lgTabelaDez = valor;
-		if(i== 11)  lgTabelaOnze = valor;
-		if(i== 12)  lgTabelaDoze = valor;//*/
-		/*--i;
-		if((i>0) && itensPlanejamento.get(i) != null)
-			itensPlanejamento.get(i).setLgTabela(valor);*/
+		if (i == 11) lgTabelaOnze = valor;
+		if (i == 12) lgTabelaDoze = valor;
 	}
 
 	public void limpaAluno(){
 		aluno = new Aluno();
 		lgMatriculaAluno = false;
-		lgNomeAluno  = false;
+		lgNomeAluno = false;
 		ira = 0;
-		periodo = 0;	
+		periodo = 0;
 		horasObrigatorias = 0;
 		horasObrigatoriasConcluidas = 0;
 		horasOpcionaisConcluidas = 0;
 		horasEletivasConcluidas = 0;
 		qtdHorasPeriodo = 360;
-		listaDisciplinaSelecionadas = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasDois = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasTres = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasQuatro = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasCinco = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasSeis = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasSete = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasOito = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasNove = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasDez = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasOnze = new ArrayList<DisciplinaPlanejamento>();
-		listaDisciplinaSelecionadasDoze = new ArrayList<DisciplinaPlanejamento>();
+		listaDisciplinaSelecionadas = new ArrayList<>();
+		listaDisciplinaSelecionadasDois = new ArrayList<>();
+		listaDisciplinaSelecionadasTres = new ArrayList<>();
+		listaDisciplinaSelecionadasQuatro = new ArrayList<>();
+		listaDisciplinaSelecionadasCinco = new ArrayList<>();
+		listaDisciplinaSelecionadasSeis = new ArrayList<>();
+		listaDisciplinaSelecionadasSete = new ArrayList<>();
+		listaDisciplinaSelecionadasOito = new ArrayList<>();
+		listaDisciplinaSelecionadasNove = new ArrayList<>();
+		listaDisciplinaSelecionadasDez = new ArrayList<>();
+		listaDisciplinaSelecionadasOnze = new ArrayList<>();
+		listaDisciplinaSelecionadasDoze = new ArrayList<>();
 		lgTabelaUm = false;
 		lgTabelaDois = false;
 		lgTabelaTres = false;
@@ -861,63 +830,6 @@ public class PlanejamentoFormaturaController implements Serializable {
 		lgCampoHrsPeriodo = true;
 		aluno.setGrade(grade);
 	}
-
-	/*public void gerarDadosAluno(Student st, Curriculum cur)
-	{
-		HashMap<Class, ArrayList<String[]>> aprovado;
-		HashMap<Class, ArrayList<String[]>> matriculadosGrade;
-		horasObrigatorias = 0;
-		horasObrigatoriasConcluidas = aluno.getHorasObrigatoriasCompletadas();
-		horasOpcionaisConcluidas = aluno.getHorasOpcionaisCompletadas();
-		horasEletivasConcluidas = aluno.getHorasEletivasCompletadas();
-		aprovado = new HashMap<Class, ArrayList<String[]>>(st.getClasses(ClassStatus.APPROVED)); 
-		matriculadosGrade = new HashMap<Class, ArrayList<String[]>>(st.getClasses(ClassStatus.ENROLLED)); 
-		TreeSet<String> naocompletado = new TreeSet<String>();
-		for(int i: cur.getMandatories().keySet()){
-			for(Class c: cur.getMandatories().get(i)){
-				horasObrigatorias = horasObrigatorias + c.getWorkload();
-				if (matriculadosGrade.containsKey(c) && matriculados){
-					//horasObrigatoriasConcluidas = horasObrigatoriasConcluidas + c.getWorkload();
-					matriculadosGrade.remove(c);
-				}
-				if(!aprovado.containsKey(c)) {
-					naocompletado.add(c.getId());
-				}
-				else{
-					//horasObrigatoriasConcluidas = horasObrigatoriasConcluidas + c.getWorkload();
-					aprovado.remove(c);
-				}
-			}	
-		}
-		//int creditos = 0;
-		for(Class c: cur.getElectives()){
-			if(aprovado.containsKey(c))	{
-				//creditos += c.getWorkload();
-				aprovado.remove(c);
-			}
-			if (matriculadosGrade.containsKey(c) && matriculados){
-				//creditos += c.getWorkload();
-				matriculadosGrade.remove(c);
-			}
-		}
-		//horasEletivasConcluidas = creditos;
-		//creditos = 0;
-		Set<Class> ap = aprovado.keySet();
-		Iterator<Class> i = ap.iterator();
-		while(i.hasNext()){
-			Class c = i.next();
-			//creditos += c.getWorkload();
-		}
-		if (matriculados){
-			Set<Class> apm = matriculadosGrade.keySet();
-			Iterator<Class> im = apm.iterator();
-			while(im.hasNext())	{
-				Class c = im.next();
-				//creditos += c.getWorkload();
-			}
-		}
-		//horasOpcionaisConcluidas = creditos;
-	}//*/
 
 	//========================================================= GET - SET ==================================================================================//
 
