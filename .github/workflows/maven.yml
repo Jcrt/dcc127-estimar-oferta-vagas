@@ -10,9 +10,9 @@ name: "(Maven) Build, test and analyze"
 
 on:
   push:
-    branches: [ "master", "develop" ]
+    branches: [ "master", "develop", "sonarqube/p0" ]
   pull_request:
-    branches: [ "master", "develop" ]
+    branches: [ "master", "develop", "sonarqube/p0" ]
 
 jobs:
   build:
