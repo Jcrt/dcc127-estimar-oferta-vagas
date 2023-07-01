@@ -1,9 +1,9 @@
-[![(Maven) Build, test and analyze](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/actions/workflows/maven.yml/badge.svg)](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/actions/workflows/maven.yml) 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Jcrt_dcc127-estimar-oferta-vagas&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Jcrt_dcc127-estimar-oferta-vagas)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Jcrt_dcc127-estimar-oferta-vagas&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Jcrt_dcc127-estimar-oferta-vagas)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Jcrt_dcc127-estimar-oferta-vagas&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Jcrt_dcc127-estimar-oferta-vagas)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Jcrt_dcc127-estimar-oferta-vagas&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Jcrt_dcc127-estimar-oferta-vagas)
 
-
+[![(Maven) Build, test and analyze](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/actions/workflows/maven.yml/badge.svg)](https://github.com/Jcrt/dcc127-estimar-oferta-vagas/actions/workflows/maven.yml) 
 
 # 🖥️EstimarOfertaVagas-Web
 Repositório com a versão web do sistema, para aplicação de técnicas de engenharia de software para trabalho de conclusão de curso.
