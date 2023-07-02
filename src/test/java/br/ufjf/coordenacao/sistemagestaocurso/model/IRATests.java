@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("IRA tests")
-class IRATest {
+class IRATests {
 	@Test
 	@DisplayName("Given IRA object WHEN clone is called THEN should create a different object")
 	void GIVEN_iraObject_WHEN_cloneIsCalled_THEN_shouldCreateADifferentObject() throws CloneNotSupportedException {

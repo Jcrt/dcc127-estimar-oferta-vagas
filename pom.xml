@@ -377,19 +377,23 @@
 							<goal>check</goal>
 						</goals>
 						<configuration>
-							<rules>
-								<rule>
-									<element>BUNDLE</element>
-									<limits>
-										<limit>
-											<counter>COMPLEXITY</counter>
-											<value>COVEREDRATIO</value>
-											<minimum>0.70</minimum>
-										</limit>
-									</limits>
-								</rule>
-							</rules>
-						</configuration>
+                            <excludes>
+                                <!-- Substitua com o nome da sua classe ou pacote -->
+                                <exclude>**/Mocks.*</exclude>
+                            </excludes>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>COMPLEXITY</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.70</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
 					</execution>
 				</executions>
 			</plugin>
