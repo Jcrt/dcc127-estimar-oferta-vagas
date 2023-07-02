@@ -6,6 +6,8 @@ import java.util.TreeSet;
 
 import br.ufjf.coordenacao.OfertaVagas.model.*;
 import br.ufjf.coordenacao.OfertaVagas.model.Class;
+import br.ufjf.coordenacao.sistemagestaocurso.enums.DisciplinaTipo;
+import br.ufjf.coordenacao.sistemagestaocurso.enums.PreRequisitoTipo;
 import br.ufjf.coordenacao.sistemagestaocurso.model.*;
 
 public class ImportarArvore implements Serializable{
@@ -59,19 +61,16 @@ public class ImportarArvore implements Serializable{
 		if (consideraCoGrade != null && consideraCo == consideraCoGrade){
 			return;
 		}
-		
-		
 
 		estruturaArvore = EstruturaArvore.getInstance();
-		
-		
-		
 		_cur = new Curriculum();
-		List<GradeDisciplina> listaGradeDisciplina = grade.getGrupoGradeDisciplina();		
+
+		List<GradeDisciplina> listaGradeDisciplina = grade.getGrupoGradeDisciplina();
+
 		for(GradeDisciplina gradeDisciplina : listaGradeDisciplina){
 			List<PreRequisito> listaPreRequisito = gradeDisciplina.getPreRequisito();
 			//subindo as obrigatorias e seus requisitos
-			if (gradeDisciplina.getTipoDisciplina().equals("Obrigatoria") ){
+			if (gradeDisciplina.getTipoDisciplina().equals(DisciplinaTipo.REQUIRED.toString()) ){
 				String semester = String.valueOf(gradeDisciplina.getPeriodo());
 				String _class = gradeDisciplina.getDisciplina().getCodigo();
 				Class c = ClassFactory.getClass(grade.getCurso().getCodigo(),grade.getCodigo(),_class);
@@ -81,7 +80,7 @@ public class ImportarArvore implements Serializable{
 				for (PreRequisito prerequisito:listaPreRequisito){
 					String prerequisite = prerequisito.getDisciplina().getCodigo(); 
 					Class pre = ClassFactory.getClass(grade.getCurso().getCodigo(),grade.getCodigo(),prerequisite);
-					if (prerequisito.getTipo().equals("Co-Requisito")){
+					if (prerequisito.getTipo().equals(PreRequisitoTipo.COREQUISITO.toString())){
 						c.addCorequisite(pre);
 					}
 					else{
@@ -228,7 +227,6 @@ public class ImportarArvore implements Serializable{
 		this.consideraCoGrade = consideraCoGrade;
 	}
 
-
 	public Boolean getResetarStance() {
 		return resetarStance;
 	}
@@ -236,9 +234,4 @@ public class ImportarArvore implements Serializable{
 	public void setResetarStance(Boolean resetarStance) {
 		this.resetarStance = resetarStance;
 	}
-
-
-
-	
-	
 }
