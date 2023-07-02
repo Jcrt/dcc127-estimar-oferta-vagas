@@ -10,3 +10,6 @@ application.token
 # Maven
 target/
 /bin/
+
+# IDEA
+.idea/
