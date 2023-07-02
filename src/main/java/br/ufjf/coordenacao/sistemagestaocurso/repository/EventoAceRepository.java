@@ -13,8 +13,6 @@ public class EventoAceRepository extends BaseRepository implements Serializable 
 	public EventoAceRepository() {
 	}
 
-	;
-
 	public EventoAceRepository(EntityManager manager) {
 		this.manager = manager;
 	}

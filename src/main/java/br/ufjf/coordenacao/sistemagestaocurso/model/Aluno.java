@@ -301,15 +301,12 @@ public class Aluno implements Cloneable {
 				}
 				else
 				{
-					Disciplina opcional = null;
-					
 					for(Disciplina disciplina: disciplinas) {
 						if(disciplina.getCodigo().equals(c.getId())) {
-							opcional = disciplina;
-							this.disciplinasOpcionaisCompletadas.add(opcional);
+							horasOpcionaisCompletadas += disciplina.getCargaHoraria();
+							this.disciplinasOpcionaisCompletadas.add(disciplina);
 						}
 					}
-					horasOpcionaisCompletadas += opcional.getCargaHoraria();
 				}
 			}
 		}
