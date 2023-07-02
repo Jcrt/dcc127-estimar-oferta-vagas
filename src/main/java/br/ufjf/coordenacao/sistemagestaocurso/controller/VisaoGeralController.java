@@ -298,15 +298,15 @@ public class VisaoGeralController implements Serializable {
 		if (listaGradeHistorico.size() != 0){
 			for (i=0; i< listaGradeHistorico.get(0).getHistoricoAluno().size(); i++){
 				for(GradeHistorico gradeHistorico:listaGradeHistorico){
-					if (gradeHistorico.getHistoricoAluno().get(i) == "#7777FF")
+					if (gradeHistorico.getHistoricoAluno().get(i).equals("#7777FF"))
 						listaEspectativaDisciplina.get(i).setNrMatriculados(listaEspectativaDisciplina.get(i).getNrMatriculados() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FFA500")
+					else if (gradeHistorico.getHistoricoAluno().get(i).equals("#FFA500"))
 						listaEspectativaDisciplina.get(i).setNrRN(listaEspectativaDisciplina.get(i).getNrRN() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FF0000")
+					else if (gradeHistorico.getHistoricoAluno().get(i).equals("#FF0000"))
 						listaEspectativaDisciplina.get(i).setNrRF(listaEspectativaDisciplina.get(i).getNrRF() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#04B431")
+					else if (gradeHistorico.getHistoricoAluno().get(i).equals("#04B431"))
 						listaEspectativaDisciplina.get(i).setNrH(listaEspectativaDisciplina.get(i).getNrH() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FA00FF")
+					else if (gradeHistorico.getHistoricoAluno().get(i).equals("#FA00FF"))
 						listaEspectativaDisciplina.get(i).setNrQH(listaEspectativaDisciplina.get(i).getNrQH() + 1);
 				}
 			}

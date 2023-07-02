@@ -2,13 +2,14 @@ package br.ufjf.coordenacao.sistemagestaocurso.model;
 
 import br.ufjf.coordenacao.OfertaVagas.model.Class;
 import br.ufjf.coordenacao.OfertaVagas.model.*;
+import br.ufjf.coordenacao.sistemagestaocurso.providers.IEstruturaArvoreProvider;
+import br.ufjf.coordenacao.sistemagestaocurso.providers.IFacesContextProvider;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.DisciplinaRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.repository.EventoAceRepository;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.persistence.*;
 import java.util.*;
@@ -46,7 +47,10 @@ public class Aluno implements Cloneable {
 	private EventoAceRepository eventoAceRepository;
 
 	@Inject
-	private FacesContext facesContext;
+	private IFacesContextProvider facesContextProvider;
+
+	@Inject
+	private IEstruturaArvoreProvider estruturaArvoreProvider;
 
 	// ==========================GETTERS_AND_SETTERS======================================================================================================//
 
@@ -220,9 +224,9 @@ public class Aluno implements Cloneable {
 		this.horasOpcionaisCompletadas = 0;
 		this.sobraHorasEletivas = 0;
 		this.horasCalculadas = false;
-		
+
 		ImportarArvore importador;
-		EstruturaArvore estruturaArvore = EstruturaArvore.getInstance();
+		EstruturaArvore estruturaArvore = estruturaArvoreProvider.provide();
 		importador = estruturaArvore.recuperarArvore(this.grade,false);
 		
 		Curriculum cur = importador.get_cur();
@@ -231,7 +235,7 @@ public class Aluno implements Cloneable {
 		
 		if (st == null){
 			FacesMessage msg = new FacesMessage("O aluno:" + this.getMatricula() + " não tem nenhum histórico de matricula cadastrado!");
-			facesContext.addMessage(null, msg);
+			facesContextProvider.provide().addMessage(null, msg);
 			return;
 		}
 		

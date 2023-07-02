@@ -1,13 +1,12 @@
 package br.ufjf.coordenacao.sistemagestaocurso.utils;
 
-import br.ufjf.coordenacao.OfertaVagas.model.*;
 import br.ufjf.coordenacao.OfertaVagas.model.Class;
+import br.ufjf.coordenacao.OfertaVagas.model.*;
 import br.ufjf.coordenacao.sistemagestaocurso.enums.DisciplinaStatus;
 import br.ufjf.coordenacao.sistemagestaocurso.enums.DisciplinaTipo;
 import br.ufjf.coordenacao.sistemagestaocurso.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Mocks {
@@ -36,15 +35,9 @@ public class Mocks {
 	List<Aluno> alunos = new ArrayList<>();
 	List<Disciplina> disciplinas = new ArrayList<>();
 	List<GradeDisciplina> gradeDisciplinas = new ArrayList<>();
-	List<Historico> historicos = new ArrayList<>();
+	HashMap<Long, List<Historico>> historicos = new HashMap<>();
 
-	public Curso getCurso() {
-		return curso;
-	}
-	public Grade getGrade() { return grade; }
-	public List<Historico> getHistoricos() { return historicos; }
-
-	public Mocks(){
+	public Mocks() {
 		this.PopulatePessoas();
 		this.PopulateCurso();
 		this.PopulatePessoaCurso();
@@ -64,54 +57,160 @@ public class Mocks {
 		this.setPessoaCurso();
 		this.setCurriculumClasses();
 		this.setCurriculumStudentRelation();
-		this.setStudentsHistoryStudents();
-
 		this.PopulateAndSetHistoricos();
+		this.setStudentsHistoryStudents();
+	}
+
+	public Curso getCurso() {
+		return curso;
+	}
+
+	public Aluno getAluno() {
+		return this.alunos.get(0);
+	}
+
+	public Grade getGrade() {
+		return grade;
+	}
+
+	public List<Historico> getHistoricos() {
+		List<Historico> todosHistoricos = new ArrayList<>();
+		Collection<List<Historico>> historicosList = historicos.values();
+		historicosList.forEach(todosHistoricos::addAll);
+		return todosHistoricos;
+	}
+
+	public List<Disciplina> getDisciplinas() {
+		return disciplinas;
+	}
+
+	private void addStatusToMap(long alunoId, DisciplinaStatus status, HashMap<Long, DisciplinaStatus[]> mapAlunoDisciplina) {
+		DisciplinaStatus[] statusArray = new DisciplinaStatus[10];
+		Arrays.fill(statusArray, status);
+		mapAlunoDisciplina.put(alunoId, statusArray);
+	}
+
+	private HashMap<Long, DisciplinaStatus[]> createMapStatusDisciplinaPorAluno() {
+		HashMap<Long, DisciplinaStatus[]> mapAlunoDisciplina = new HashMap<>();
+		addStatusToMap(1L, DisciplinaStatus.APPROVED, mapAlunoDisciplina);
+		addStatusToMap(2L, DisciplinaStatus.REPPROVED_BY_FREQUENCY, mapAlunoDisciplina);
+		addStatusToMap(3L, DisciplinaStatus.REPPROVED_BY_SCORE, mapAlunoDisciplina);
+		addStatusToMap(4L, DisciplinaStatus.LOCKED, mapAlunoDisciplina);
+		addStatusToMap(5L, DisciplinaStatus.CANCELLED, mapAlunoDisciplina);
+		addStatusToMap(6L, DisciplinaStatus.DISPENSED, mapAlunoDisciplina);
+		addStatusToMap(7L, DisciplinaStatus.ENROLLED, mapAlunoDisciplina);
+
+		mapAlunoDisciplina.put(8L, new DisciplinaStatus[]{
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.REPPROVED_BY_SCORE,
+				DisciplinaStatus.REPPROVED_BY_SCORE,
+				DisciplinaStatus.REPPROVED_BY_SCORE
+		});
+
+		mapAlunoDisciplina.put(9L, new DisciplinaStatus[]{
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.REPPROVED_BY_FREQUENCY,
+				DisciplinaStatus.REPPROVED_BY_FREQUENCY,
+				DisciplinaStatus.REPPROVED_BY_SCORE,
+				DisciplinaStatus.REPPROVED_BY_SCORE,
+				DisciplinaStatus.REPPROVED_BY_SCORE
+		});
+
+		mapAlunoDisciplina.put(10L, new DisciplinaStatus[]{
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.APPROVED,
+				DisciplinaStatus.LOCKED,
+				DisciplinaStatus.LOCKED,
+				DisciplinaStatus.REPPROVED_BY_FREQUENCY,
+				DisciplinaStatus.REPPROVED_BY_FREQUENCY,
+				DisciplinaStatus.REPPROVED_BY_SCORE,
+				DisciplinaStatus.REPPROVED_BY_SCORE,
+				DisciplinaStatus.CANCELLED
+		});
+
+		return mapAlunoDisciplina;
 	}
 
 	private void PopulateAndSetHistoricos() {
 		AtomicReference<Long> id = new AtomicReference<>(1L);
-		List<String> statusDisciplina = new ArrayList<>();
-		statusDisciplina.add(DisciplinaStatus.REPPROVED_BY_FREQUENCY.toString());
-		statusDisciplina.add(DisciplinaStatus.REPPROVED_BY_SCORE.toString());
-		statusDisciplina.add(DisciplinaStatus.LOCKED.toString());
-		statusDisciplina.add(DisciplinaStatus.APPROVED.toString());
-		statusDisciplina.add(DisciplinaStatus.CANCELLED.toString());
-		statusDisciplina.add(DisciplinaStatus.DISPENSED.toString());
-		statusDisciplina.add(DisciplinaStatus.ENROLLED.toString());
+		HashMap<Long, DisciplinaStatus[]> mapAlunoDisciplina = createMapStatusDisciplinaPorAluno();
 
 		for (Aluno aluno : alunos) {
+			List<Historico> criacaoHistoricos = new ArrayList<>();
+
 			disciplinas.forEach(disciplina -> {
+				long nota = (10 * id.get()) % 100;
+				DisciplinaStatus[] statusDisciplina = mapAlunoDisciplina.get(aluno.getId());
+
 				Historico historico = new Historico();
 				historico.setId(id.getAndSet(id.get() + 1));
 				historico.setSemestreCursado(String.valueOf(curriculumSemester));
-				historico.setNota(String.valueOf((10 * id.get())));
+				historico.setNota(String.valueOf(nota));
 				historico.setAluno(aluno);
 				historico.setDisciplina(disciplina);
-				historico.setStatusDisciplina(
-						statusDisciplina.get(id.get().intValue() % statusDisciplina.size())
-				);
+				historico.setStatusDisciplina(statusDisciplina[disciplina.getId().intValue()].toString());
+				criacaoHistoricos.add(historico);
 
-				historicos.add(historico);
+				historicos.put(aluno.getId(), criacaoHistoricos);
 			});
 		}
 	}
 
 	private void setStudentsHistoryStudents() {
 		students.forEach(student -> {
-			ClassStatus[] classStatusList = ClassStatus.values();
-			studentsHistory.add(
-				student.getId(),
-				student.getNome(),
-				student.getCourse(),
-				student.getCurriculum(),
-				String.valueOf(curriculumSemester),
-				student.getClass().getName(),
-				classStatusList[Integer.parseInt(student.getId()) % classStatusList.length],
-				codigoGrade,
-				String.valueOf(4)
-			);
+			historicos.get(Long.parseLong(student.getId()))
+					.forEach(historico -> {
+						studentsHistory.add(
+								student.getId(),
+								student.getNome(),
+								student.getCourse(),
+								student.getCurriculum(),
+								String.valueOf(curriculumSemester),
+								student.getClass().getName(),
+								classStatusMapping(historico),
+								codigoGrade,
+								String.valueOf(4)
+						);
+					});
 		});
+	}
+
+	/**
+	 * Faz mapeamento entre a descrição do histórico e o enum {@link ClassStatus}
+	 *
+	 * @param historico o {@link Historico informado}
+	 * @return o valor correspondente do enum ou nulo
+	 */
+	private ClassStatus classStatusMapping(Historico historico) {
+		String classStatus = historico.getStatusDisciplina();
+
+		switch (classStatus) {
+			case "Matriculado":
+				return ClassStatus.ENROLLED;
+			case "Aprovado":
+			case "Dispensado":
+				return ClassStatus.APPROVED;
+			case "Rep Nota":
+				return ClassStatus.REPROVED_GRADE;
+			case "Rep Freq":
+				return ClassStatus.REPROVED_FREQUENCY;
+			case "Trancado":
+			case "Cancelado":
+				return ClassStatus.NOT_ENROLLED;
+			default:
+				return null;
+		}
 	}
 
 	private void PopulateStudentsHistory() {
@@ -121,7 +220,7 @@ public class Mocks {
 	private void setCurriculumClasses() {
 		classes.forEach(klass -> {
 			int classId = Integer.parseInt(klass.getId());
-			if(classId > 7)
+			if (classId > 14)
 				curriculum.addElectiveClass(klass);
 			else
 				curriculum.addMandatoryClass(curriculumSemester, klass);
@@ -129,7 +228,12 @@ public class Mocks {
 	}
 
 	private void populateClasses() {
-		for(int i = 0; i < 10; i++) {
+		disciplinas.forEach(disciplina -> {
+			Class klass = new Class(String.valueOf(disciplina.getId()));
+			classes.add(klass);
+		});
+
+		for (int i = 0; i < 10; i++) {
 			Class klass = new Class(String.valueOf(i));
 			classes.add(klass);
 		}
@@ -175,22 +279,28 @@ public class Mocks {
 		curso.setGrupoAlunos(alunos);
 	}
 
+	/**
+	 * Popula a grade com as primeiras 12 disciplinas.
+	 * Essa técnica é usada para que as outras 8 possam ser inclusas como eletivas/opcionais.
+	 */
 	private void PopulateGradeDisciplina() {
-		disciplinas.forEach(disciplina -> {
-			long disciplinaId = disciplina.getId();
-			GradeDisciplina gd = new GradeDisciplina();
-			gd.setId(disciplinaId);
-			gd.setGrade(grade);
-			gd.setDisciplina(disciplina);
-			gd.setPeriodo(periodoDisciplina);
-			gd.setExcluirIra(disciplinaId % 2 == 0);
-			gd.setTipoDisciplina(
-				disciplinaId > 7
-					? DisciplinaTipo.OPTIONAL.toString()
-					: DisciplinaTipo.REQUIRED.toString()
-			);
-			gradeDisciplinas.add(gd);
-		});
+		disciplinas.stream()
+				.limit(7)
+				.forEach(disciplina -> {
+					long disciplinaId = disciplina.getId();
+					GradeDisciplina gd = new GradeDisciplina();
+					gd.setId(disciplinaId);
+					gd.setGrade(grade);
+					gd.setDisciplina(disciplina);
+					gd.setPeriodo(periodoDisciplina);
+					gd.setExcluirIra(disciplinaId % 2 == 0);
+					gd.setTipoDisciplina(
+							disciplinaId <= 5
+									? DisciplinaTipo.OPTIONAL.toString()
+									: DisciplinaTipo.REQUIRED.toString()
+					);
+					gradeDisciplinas.add(gd);
+				});
 	}
 
 	private void PopulateGrade() {

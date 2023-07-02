@@ -6,18 +6,15 @@ import br.ufjf.coordenacao.sistemagestaocurso.providers.EstruturaArvoreProvider;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.utils.Mocks;
+import br.ufjf.coordenacao.sistemagestaocurso.utils.TestBaseClass;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.context.annotation.Description;
 
-class VisaoGeralControllerTests {
-
-	Mocks _mocks;
+class VisaoGeralControllerTests extends TestBaseClass {
 
 	@Mock
 	UsuarioController usuarioControllerMock;
@@ -31,31 +28,25 @@ class VisaoGeralControllerTests {
 	@InjectMocks
 	VisaoGeralController visaoGeralController;
 
-	@BeforeEach
-	void setup(){
-		MockitoAnnotations.openMocks(this);
-	}
+	@Override
+	public void specificSetup() {
+		EstruturaArvore estruturaArvore = EstruturaArvore.getInstance();
+		ImportarArvore importarArvore = estruturaArvore.recuperarArvore(mocks.getGrade(), true);
+		importarArvore.importarHistorico(mocks.getHistoricos());
 
-	public VisaoGeralControllerTests(){
-		_mocks = new Mocks();
+		Mockito.when(usuarioControllerMock.getAutenticacao()).thenReturn(autenticacaoMock);
+		Mockito.when(autenticacaoMock.getCursoSelecionado()).thenReturn(mocks.getCurso());
+		Mockito.when(estruturaArvoreProviderMock.provide()).thenReturn(estruturaArvore);
 	}
 
 	@Test
-	@Description("GIVEN VisaoGeralController WHEN gerarDados is called THEN generate correct subject counts")
+	@DisplayName("GIVEN VisaoGeralController WHEN gerarDados is called THEN generate correct subject counts")
 	void visaoGeralControllerTest1() {
-		EstruturaArvore estruturaArvore = EstruturaArvore.getInstance();
-		ImportarArvore importarArvore = estruturaArvore.recuperarArvore(_mocks.getGrade(), true);
-		importarArvore.importarHistorico(_mocks.getHistoricos());
-
-		Mockito.when(usuarioControllerMock.getAutenticacao()).thenReturn(autenticacaoMock);
-		Mockito.when(autenticacaoMock.getCursoSelecionado()).thenReturn(_mocks.getCurso());
-		Mockito.when(estruturaArvoreProviderMock.provide()).thenReturn(estruturaArvore);
-
 		visaoGeralController.init();
 
 		visaoGeralController.getListagrade().add(Mocks.codigoGrade);
 
-		visaoGeralController.setCurso(_mocks.getCurso());
+		visaoGeralController.setCurso(mocks.getCurso());
 
 		visaoGeralController.gerarDados();
 
