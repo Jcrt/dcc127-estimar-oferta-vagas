@@ -2,24 +2,18 @@ package br.ufjf.coordenacao.sistemagestaocurso.controller;
 
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.Autenticacao;
-import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.EspectativaDisciplina;
-import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.GradeHistorico;
 import br.ufjf.coordenacao.sistemagestaocurso.providers.EstruturaArvoreProvider;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.utils.Mocks;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.springframework.context.annotation.Description;
 
 class VisaoGeralControllerTests {
 
@@ -47,7 +41,8 @@ class VisaoGeralControllerTests {
 	}
 
 	@Test
-	void testGerarDados() {
+	@Description("GIVEN VisaoGeralController WHEN gerarDados is called THEN generate correct subject counts")
+	void visaoGeralControllerTest1() {
 		EstruturaArvore estruturaArvore = EstruturaArvore.getInstance();
 		ImportarArvore importarArvore = estruturaArvore.recuperarArvore(_mocks.getGrade(), true);
 		importarArvore.importarHistorico(_mocks.getHistoricos());
@@ -63,5 +58,9 @@ class VisaoGeralControllerTests {
 		visaoGeralController.setCurso(_mocks.getCurso());
 
 		visaoGeralController.gerarDados();
+
+		Assertions.assertEquals(10, visaoGeralController.getListaDisciplinasDisponiveis().size());
+		Assertions.assertEquals(10, visaoGeralController.getListaTodasDisciplinasDisponiveis().size());
+		Assertions.assertEquals(10, visaoGeralController.getListaEspectativaDisciplina().size());
 	}
 }
