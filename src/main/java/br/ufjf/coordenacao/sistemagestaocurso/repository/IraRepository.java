@@ -1,25 +1,22 @@
 package br.ufjf.coordenacao.sistemagestaocurso.repository;
 
+import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Grade;
+import br.ufjf.coordenacao.sistemagestaocurso.model.IRA;
+
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
+public class IraRepository extends BaseRepository implements Serializable {
 
-import br.ufjf.coordenacao.sistemagestaocurso.model.*;
-
-public class IraRepository implements Serializable{
-	
 	private static final long serialVersionUID = 1L;
-	
-	@Inject private EntityManager manager;
-	
+
 	@SuppressWarnings("unchecked")
-	public List<IRA> porAluno(Aluno a)
-	{
+	public List<IRA> porAluno(Aluno a) {
 		try {
 			return (List<IRA>) manager.createQuery("FROM IRA where ID_ALUNO = :matricula").setParameter(0, a.getId())
 					.getResultList();
@@ -116,25 +113,7 @@ public class IraRepository implements Serializable{
 				.setParameter("aluno", a.getId())
 				.executeUpdate();
 	}
-	
-	public IRA persistir(IRA ira)
-	{
-		EntityTransaction transaction = null;
-		
-		try {
-			transaction = manager.getTransaction();
-			if (!transaction.isActive())
-				transaction.begin();
-			ira = manager.merge(ira);
-			transaction.commit();
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
-		
-		return ira;
-	}
-	
+
 	public void persistir(List<IRA> iras)
 	{
 		EntityTransaction transaction = null;

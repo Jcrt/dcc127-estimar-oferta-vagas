@@ -2,46 +2,27 @@ package br.ufjf.coordenacao.sistemagestaocurso.repository;
 
 import br.ufjf.coordenacao.sistemagestaocurso.model.EventoAce;
 
-import java.util.List;
-import java.io.Serializable;
-import java.math.BigDecimal;
-
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
-public class EventoAceRepository implements Serializable {
+public class EventoAceRepository extends BaseRepository implements Serializable {
 
-	@Inject
-	private EntityManager manager;
-	
-	public EventoAceRepository(){ };
-	
-	public EventoAceRepository(EntityManager manager)
-	{
+	public EventoAceRepository() {
+	}
+
+	;
+
+	public EventoAceRepository(EntityManager manager) {
 		this.manager = manager;
 	}
-	
+
 	private static final long serialVersionUID = 1L;
 
 	public EventoAce porid(long id) {
 		return manager.find(EventoAce.class, id);
-	}
-
-	public EventoAce persistir(EventoAce objeto) {
-		EntityTransaction transaction = null;
-		
-		try {
-			transaction = manager.getTransaction();
-			transaction.begin();
-			objeto = manager.merge(objeto);
-			transaction.commit();
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
-		
-		return objeto;
 	}
 
 	public void remover(EventoAce objeto) {

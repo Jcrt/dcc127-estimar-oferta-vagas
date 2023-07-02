@@ -1,49 +1,24 @@
 package br.ufjf.coordenacao.sistemagestaocurso.repository;
 
+import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
+import org.apache.log4j.Logger;
+
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-
-import org.apache.log4j.Logger;
-
-import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
-
-public class AlunoRepository implements Serializable {
+public class AlunoRepository extends BaseRepository implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
-	private Logger logger = Logger.getLogger(AlunoRepository.class);
 
-	@Inject
-	private EntityManager manager;
-	
+	private Logger logger = Logger.getLogger(AlunoRepository.class);
 
 	public Aluno buscarPorId(long id) {
 		return manager.find(Aluno.class, id);
 	}
 
-	public Aluno persistir(Aluno aluno) {
-		EntityTransaction transaction = null;
-		
-		try {
-			transaction = manager.getTransaction();
-			if (!transaction.isActive())
-				transaction.begin();
-			aluno = manager.merge(aluno);
-			transaction.commit();
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
-		
-		return aluno;
-	}
-	
 	public List<Aluno> persistir(List<Aluno> alunos) {
 		EntityTransaction transaction = null;
 		

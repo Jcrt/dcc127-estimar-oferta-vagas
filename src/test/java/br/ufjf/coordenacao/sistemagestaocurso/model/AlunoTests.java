@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 class AlunoTests extends TestBaseClass {
@@ -30,7 +29,7 @@ class AlunoTests extends TestBaseClass {
 	DisciplinaRepository disciplinaRepositoryMock;
 
 	@InjectMocks
-	Aluno aluno = mocks.getAluno();
+	Aluno aluno = mocks.getAlunos().get(0);
 
 	@Override
 	public void specificSetup() {
@@ -51,11 +50,11 @@ class AlunoTests extends TestBaseClass {
 
 		assertEquals(7, aluno.getHorasObrigatoriasCompletadas());
 		assertEquals(21, aluno.getSobraHorasEletivas());
-		assertEquals(48, aluno.getSobraHorasOpcionais());
+		assertEquals(75, aluno.getSobraHorasOpcionais());
 	}
 
 	@Test
-	@DisplayName("GIVEN aluno WHEN a subject isnt in grade THEN throws exception")
+	@DisplayName("GIVEN aluno WHEN a subject isnt in grade THEN not throw exception and calculate hours correctly")
 	void AlunoTests2() {
 		List<Disciplina> disciplinaList = mocks.getDisciplinas()
 				.stream()
@@ -65,8 +64,8 @@ class AlunoTests extends TestBaseClass {
 		when(disciplinaRepositoryMock.listarTodos()).thenReturn(disciplinaList);
 		aluno.setDisciplinaRepository(disciplinaRepositoryMock);
 
-		assertThrows(NullPointerException.class, () -> {
-			aluno.calculaHorasCompletadas();
-		});
+		assertEquals(7, aluno.getHorasObrigatoriasCompletadas());
+		assertEquals(21, aluno.getSobraHorasEletivas());
+		assertEquals(75, aluno.getSobraHorasOpcionais());
 	}
 }
