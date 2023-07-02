@@ -19,14 +19,12 @@ import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
 import br.ufjf.coordenacao.sistemagestaocurso.model.*;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.EspectativaDisciplina;
 import br.ufjf.coordenacao.sistemagestaocurso.model.estrutura.GradeHistorico;
+import br.ufjf.coordenacao.sistemagestaocurso.providers.EstruturaArvoreProvider;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.EstruturaArvore;
 import br.ufjf.coordenacao.sistemagestaocurso.util.arvore.ImportarArvore;
 
 import org.apache.log4j.Logger;
 import org.primefaces.component.datatable.DataTable;
-
-
-
 
 @Named
 @ViewScoped
@@ -87,19 +85,21 @@ public class VisaoGeralController implements Serializable {
 	private boolean lgBarra = true;
 	private Grade grade;
 	private EstruturaArvore estruturaArvore;
-	
-	private static final Logger logger = Logger.getLogger(AutenticacaoController.class);
-	
+
 
 	@Inject
 	private UsuarioController usuarioController;
 
+	@Inject
+	private EstruturaArvoreProvider estruturaArvoreProvider;
+
+	private static final Logger logger = Logger.getLogger(AutenticacaoController.class);
+
 	@PostConstruct
 	public void init() {
-
-		estruturaArvore = EstruturaArvore.getInstance();
+		estruturaArvore = estruturaArvoreProvider.provide();
 		usuarioController.atualizarPessoaLogada();
-		curso = usuarioController.getAutenticacao().getCursoSelecionado();		
+		curso = usuarioController.getAutenticacao().getCursoSelecionado();
 	}
 
 
@@ -244,7 +244,7 @@ public class VisaoGeralController implements Serializable {
 							break;
 						}
 					}
-					if (achou == false){
+					if (!achou){
 						optional += class1.getId() + "; ";
 					}
 				}
@@ -260,7 +260,7 @@ public class VisaoGeralController implements Serializable {
 							break;
 						}
 					}
-					if (achou == false){
+					if (!achou){
 						optional += class1.getId() + "; ";
 					}
 				}
@@ -278,9 +278,9 @@ public class VisaoGeralController implements Serializable {
 						else if (retorno == 4)	colorCode = "#04B431";
 						else if (retorno == 5)	colorCode = "#FA00FF";
 						else colorCode = "#FFFFFF"; // Não pode cursar
-						if(((selectedOptionsSituacao.contains(colorCode) || selectedOptionsSituacaoDois.contains(colorCode) 
-								|| selectedOptionsSituacaoTres.contains(colorCode) || selectedOptionsSituacaoQuatro.contains(colorCode)) == false)
-								&& todos == false && todosituacao == false ){
+						if((!(selectedOptionsSituacao.contains(colorCode) || selectedOptionsSituacaoDois.contains(colorCode)
+								|| selectedOptionsSituacaoTres.contains(colorCode) || selectedOptionsSituacaoQuatro.contains(colorCode)))
+								&& !todos && !todosituacao){
 							naoGravar = true;
 							break;
 						}
@@ -296,13 +296,18 @@ public class VisaoGeralController implements Serializable {
 		}
 		int i = 0;
 		if (listaGradeHistorico.size() != 0){
-			for (i=0;i< listaGradeHistorico.get(0).getHistoricoAluno().size() ;i++){
+			for (i=0; i< listaGradeHistorico.get(0).getHistoricoAluno().size(); i++){
 				for(GradeHistorico gradeHistorico:listaGradeHistorico){
-					if (gradeHistorico.getHistoricoAluno().get(i) == "#7777FF") 		listaEspectativaDisciplina.get(i).setNrMatriculados(listaEspectativaDisciplina.get(i).getNrMatriculados() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FFA500") 		listaEspectativaDisciplina.get(i).setNrRN(listaEspectativaDisciplina.get(i).getNrRN() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FF0000") 		listaEspectativaDisciplina.get(i).setNrRF(listaEspectativaDisciplina.get(i).getNrRF() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#04B431") 		listaEspectativaDisciplina.get(i).setNrH(listaEspectativaDisciplina.get(i).getNrH() + 1);
-					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FA00FF") 		listaEspectativaDisciplina.get(i).setNrQH(listaEspectativaDisciplina.get(i).getNrQH() + 1);
+					if (gradeHistorico.getHistoricoAluno().get(i) == "#7777FF")
+						listaEspectativaDisciplina.get(i).setNrMatriculados(listaEspectativaDisciplina.get(i).getNrMatriculados() + 1);
+					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FFA500")
+						listaEspectativaDisciplina.get(i).setNrRN(listaEspectativaDisciplina.get(i).getNrRN() + 1);
+					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FF0000")
+						listaEspectativaDisciplina.get(i).setNrRF(listaEspectativaDisciplina.get(i).getNrRF() + 1);
+					else if (gradeHistorico.getHistoricoAluno().get(i) == "#04B431")
+						listaEspectativaDisciplina.get(i).setNrH(listaEspectativaDisciplina.get(i).getNrH() + 1);
+					else if (gradeHistorico.getHistoricoAluno().get(i) == "#FA00FF")
+						listaEspectativaDisciplina.get(i).setNrQH(listaEspectativaDisciplina.get(i).getNrQH() + 1);
 				}
 			}
 		}
@@ -313,7 +318,6 @@ public class VisaoGeralController implements Serializable {
 	}
 
 	public void calculaPercentual(){
-
 		for (EspectativaDisciplina espectativaDisciplina:listaEspectativaDisciplina){
 			espectativaDisciplina.setPercNrMatriculados( espectativaDisciplina.getNrMatriculados() * percNrMatriculados / 100	);
 			espectativaDisciplina.setPercNrRN( espectativaDisciplina.getNrRN() * percNrRN / 100	);
@@ -731,9 +735,9 @@ public class VisaoGeralController implements Serializable {
 
 		private static final long serialVersionUID = 1L;
 
-		private String header;  
-		private int mes;  
-		private String cor;
+		private final String header;
+		private final int mes;
+		private final String cor;
 
 
 		public ColumnModel(String header, int mes,String cor) {  

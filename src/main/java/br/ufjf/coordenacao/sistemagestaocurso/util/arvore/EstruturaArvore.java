@@ -69,9 +69,6 @@ public class EstruturaArvore implements Serializable{
 	}
 
 	public void removerEstrutura (Grade grade){
-
-		
-
 		for(ImportarArvore importarArvore:todasArvores){
 			if(importarArvore.getGrade().getId() == grade.getId()){
 				todasArvores.remove(importarArvore);
@@ -87,8 +84,6 @@ public class EstruturaArvore implements Serializable{
 	public static void setInstancia(EstruturaArvore instancia) {
 		EstruturaArvore.instancia = instancia;
 	}
-
-	
 
 	public String getLoginUtilizado() {
 		return loginUtilizado;

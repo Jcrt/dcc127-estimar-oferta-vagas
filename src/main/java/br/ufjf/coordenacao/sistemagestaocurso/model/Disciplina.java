@@ -103,5 +103,4 @@ public class Disciplina {
 	public void setGrupoEquivalenciaGrade(List<Equivalencia> grupoEquivalenciaGrade) {
 		this.grupoEquivalenciaGrade = grupoEquivalenciaGrade;
 	}
-
 }

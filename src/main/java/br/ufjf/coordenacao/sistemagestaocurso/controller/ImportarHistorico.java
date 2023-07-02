@@ -20,6 +20,7 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.ws.rs.NotAuthorizedException;
 
+import br.ufjf.coordenacao.sistemagestaocurso.enums.DisciplinaStatus;
 import org.apache.log4j.Logger;
 
 import br.ufjf.coordenacao.sistemagestaocurso.controller.util.UsuarioController;
@@ -56,17 +57,26 @@ public class ImportarHistorico implements Serializable {
 			// sempre ficarão no final da lista
 			// Os outros serao ordenados pela ordem dos periodos
 
-			if (o1.getStatusDisciplina().equals("Trancado") || o1.getStatusDisciplina().equals("Dispensado")
-				|| o1.getStatusDisciplina().equals("Matriculado") || o1.getStatusDisciplina().equals("Cancelado")) {
-				if (o2.getStatusDisciplina().equals("Trancado") || o2.getStatusDisciplina().equals("Dispensado")
-					|| o2.getStatusDisciplina().equals("Matriculado") || o2.getStatusDisciplina().equals("Cancelado")) {
+			if (o1.getStatusDisciplina().equals(DisciplinaStatus.LOCKED.toString())
+				|| o1.getStatusDisciplina().equals(DisciplinaStatus.DISPENSED.toString())
+				|| o1.getStatusDisciplina().equals(DisciplinaStatus.ENROLLED.toString())
+				|| o1.getStatusDisciplina().equals(DisciplinaStatus.CANCELLED.toString())
+			) {
+				if (o2.getStatusDisciplina().equals(DisciplinaStatus.LOCKED.toString())
+					|| o2.getStatusDisciplina().equals(DisciplinaStatus.DISPENSED.toString())
+					|| o2.getStatusDisciplina().equals(DisciplinaStatus.ENROLLED.toString())
+					|| o2.getStatusDisciplina().equals(DisciplinaStatus.CANCELLED.toString())
+				) {
 					return 0; // Os dois são iguais
 				} else {
 					return 1;
 				}
 			} else {
-				if (o2.getStatusDisciplina().equals("Trancado") || o2.getStatusDisciplina().equals("Dispensado")
-					|| o2.getStatusDisciplina().equals("Matriculado") || o2.getStatusDisciplina().equals("Cancelado")) {
+				if (o2.getStatusDisciplina().equals(DisciplinaStatus.LOCKED.toString())
+					|| o2.getStatusDisciplina().equals(DisciplinaStatus.DISPENSED.toString())
+					|| o2.getStatusDisciplina().equals(DisciplinaStatus.ENROLLED.toString())
+					|| o2.getStatusDisciplina().equals(DisciplinaStatus.CANCELLED.toString())
+				) {
 					return -1; // O primeiro deve vir antes do ultimo
 				} else {
 					try {
@@ -79,9 +89,7 @@ public class ImportarHistorico implements Serializable {
 					}
 				}
 			}
-
 		}
-
 	}
 
 	private Curso curso = new Curso();
