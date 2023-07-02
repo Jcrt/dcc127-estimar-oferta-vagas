@@ -2,39 +2,17 @@ package br.ufjf.coordenacao.sistemagestaocurso.repository;
 
 import br.ufjf.coordenacao.sistemagestaocurso.model.GradeDisciplina;
 
-import java.util.List;
-import java.io.Serializable;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
+import java.io.Serializable;
+import java.util.List;
 
-public class GradeDisciplinaRepository implements Serializable {
+public class GradeDisciplinaRepository extends BaseRepository implements Serializable {
 
-	@Inject
-	private EntityManager manager;
-	
 	private static final long serialVersionUID = 1L;
 
 	public GradeDisciplina porid(long id) {
 		return manager.find(GradeDisciplina.class, id);
-	}
-
-	public GradeDisciplina persistir(GradeDisciplina objeto) {
-		EntityTransaction transaction = null;
-		
-		try {
-			transaction = manager.getTransaction();
-			transaction.begin();
-			objeto = manager.merge(objeto);
-			transaction.commit();
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
-		
-		return objeto;
 	}
 
 	public void remover(GradeDisciplina objeto) {

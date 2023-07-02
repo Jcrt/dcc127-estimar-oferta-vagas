@@ -50,8 +50,8 @@ class VisaoGeralControllerTests extends TestBaseClass {
 
 		visaoGeralController.gerarDados();
 
-		Assertions.assertEquals(10, visaoGeralController.getListaDisciplinasDisponiveis().size());
-		Assertions.assertEquals(10, visaoGeralController.getListaTodasDisciplinasDisponiveis().size());
-		Assertions.assertEquals(10, visaoGeralController.getListaEspectativaDisciplina().size());
+		Assertions.assertEquals(7, visaoGeralController.getListaDisciplinasDisponiveis().size());
+		Assertions.assertEquals(7, visaoGeralController.getListaTodasDisciplinasDisponiveis().size());
+		Assertions.assertEquals(7, visaoGeralController.getListaEspectativaDisciplina().size());
 	}
 }

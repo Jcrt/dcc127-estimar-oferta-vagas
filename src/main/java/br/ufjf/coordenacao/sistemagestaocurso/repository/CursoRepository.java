@@ -1,46 +1,22 @@
 package br.ufjf.coordenacao.sistemagestaocurso.repository;
 
+import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
+
+import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.NoResultException;
-
-import br.ufjf.coordenacao.sistemagestaocurso.model.Aluno;
-import br.ufjf.coordenacao.sistemagestaocurso.model.Curso;
-import br.ufjf.coordenacao.sistemagestaocurso.model.IRA;
-
-public class CursoRepository implements Serializable {
+public class CursoRepository extends BaseRepository implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	@Inject
-	private EntityManager manager;
-
 
 	public Curso porid(long id) {
 		return manager.find(Curso.class, id);
 	}
 
-	public Curso persistir(Curso curso) {
-		EntityTransaction transaction = null;
-		
-		try {
-			transaction = manager.getTransaction();
-			transaction.begin();
-			curso = manager.merge(curso);
-			transaction.commit();
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
-		
-		return curso;
-	}
-	
 	public Curso persistirSemCommit(Curso curso) {
 		EntityTransaction transaction = null;
 		

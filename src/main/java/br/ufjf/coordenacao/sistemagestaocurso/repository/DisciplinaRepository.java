@@ -1,48 +1,26 @@
 package br.ufjf.coordenacao.sistemagestaocurso.repository;
 
-import java.io.Serializable;
-import java.util.List;
+import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
+import java.io.Serializable;
+import java.util.List;
 
-import br.ufjf.coordenacao.sistemagestaocurso.model.Disciplina;
-
-public class DisciplinaRepository implements Serializable {
+public class DisciplinaRepository extends BaseRepository implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Inject
-	private EntityManager manager;
-	
-	public DisciplinaRepository() 	{ }
-	
-	public DisciplinaRepository(EntityManager manager)
-	{
+	public DisciplinaRepository() {
+	}
+
+	public DisciplinaRepository(EntityManager manager) {
 		this.manager = manager;
 	}
 	
 	public Disciplina porid(long id) {
 		return manager.find(Disciplina.class, id);
-	}
-	
-	public Disciplina persistir(Disciplina objeto) {
-		EntityTransaction transaction = null;
-		
-		try {
-			transaction = manager.getTransaction();
-			if (!transaction.isActive())
-				transaction.begin();
-			objeto = manager.merge(objeto);
-			transaction.commit();
-		} catch (Exception e) {
-			transaction.rollback();
-			throw e;
-		}
-		
-		return objeto;
 	}
 	
 	public Disciplina persistirSemCommit(Disciplina objeto) {

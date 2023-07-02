@@ -65,8 +65,8 @@ public class Mocks {
 		return curso;
 	}
 
-	public Aluno getAluno() {
-		return this.alunos.get(0);
+	public List<Aluno> getAlunos() {
+		return this.alunos;
 	}
 
 	public Grade getGrade() {
@@ -82,6 +82,14 @@ public class Mocks {
 
 	public List<Disciplina> getDisciplinas() {
 		return disciplinas;
+	}
+
+	public List<GradeDisciplina> getGradeDisciplinas() {
+		return gradeDisciplinas;
+	}
+
+	public List<Pessoa> getPessoas() {
+		return pessoas;
 	}
 
 	private void addStatusToMap(long alunoId, DisciplinaStatus status, HashMap<Long, DisciplinaStatus[]> mapAlunoDisciplina) {
